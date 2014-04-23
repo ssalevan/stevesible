@@ -1,0 +1,7 @@
+pg_username: username
+pg_password: password
+
+rpm: pgdg-centos91-9.1-4.noarch.rpm 
+rpm_url: http://yum.postgresql.org/9.1/redhat/rhel-6-x86_64/{{ rpm }}
+
+trusted_net: 0.0.0.0/32

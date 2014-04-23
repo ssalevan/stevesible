@@ -1,0 +1,41 @@
+---
+- name: Install nginx Yum repository
+  template: src=nginx.repo
+            dest=/etc/yum.repos.d/nginx.repo
+            owner=root
+            group=root
+            mode=0644
+
+- name: Install nginx RPM
+  yum: name=nginx
+       state=present
+  notify:
+    - Restart nginx monit
+
+- name: Write nginx.conf 
+  template: src=nginx.conf
+            dest=/etc/nginx/nginx.conf
+            owner=root
+            group=root
+            mode=0644
+  notify:
+    - Ensure nginx is running
+    - Reload nginx
+
+- name: Write nginx monit configuration
+  template: src=nginx.monit
+            dest=/etc/monit.d/nginx.conf
+  notify:
+    - Reload monit
+
+- name: Ensure nginx service running
+  service: name=nginx
+           state=started
+           enabled=yes
+
+- name: Write nginx logrotate
+  template: src=nginx.logrotate
+            dest=/etc/logrotate.d/nginx
+            owner=root
+            group=root
+            mode=0644

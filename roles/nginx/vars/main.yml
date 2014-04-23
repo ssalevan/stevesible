@@ -1,0 +1,4 @@
+nginx_connections: "1024"
+nginx_user: "nginx"
+
+worker_rlimit_nofile: 2000000

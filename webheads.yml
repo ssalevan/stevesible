@@ -1,0 +1,8 @@
+---
+- name: Establishes and maintains a webhead node
+  hosts: webheads
+  user: baseuser
+  sudo: true
+
+  roles:
+    - nginx

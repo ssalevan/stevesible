@@ -1,0 +1,11 @@
+/var/log/postgres.log {
+
+  daily
+  rotate 10
+  copytruncate
+  delaycompress
+  compress
+  notifempty
+  create 640 postgres postgres
+
+}

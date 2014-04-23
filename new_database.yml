@@ -1,0 +1,22 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Generate a random number to identify the new instance
+      local_action: shell od -An -N4 -D < /dev/urandom | xargs
+      register: random_number
+
+    - name: Provision a new database node
+      local_action:
+        module: linode
+        api_key: api_key
+        name: 'db_{{ random_number.stdout }}'
+        linode_id: '{{ random_number.stdout }}'
+        plan: 1
+        datacenter: 4
+        display_group: databases
+        distribution: 123
+        ssh_pub_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+        swap: 512
+        wait: yes
+        wait_timeout: 600
+        state: present

@@ -1,0 +1,4 @@
+#!/bin/bash
+# Creates a new node, provided as the first argument.
+
+ansible-playbook -i ./local new_$1.yml

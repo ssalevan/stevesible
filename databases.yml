@@ -1,0 +1,8 @@
+---
+- name: Establishes and maintains a database node
+  hosts: databases
+  user: baseuser
+  sudo: true
+
+  roles:
+    - postgres

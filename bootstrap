@@ -1,0 +1,4 @@
+#!/bin/bash
+# Runs bootstrapping playbooks against all hosts.
+
+ansible-playbook -i ./linode bootstrap.yml

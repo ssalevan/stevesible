@@ -1,0 +1,21 @@
+---
+- name: Reload iptables configuration
+  command: /usr/sbin/ferm /etc/ferm/ferm.conf
+  command: service iptables save
+
+- name: Reload monit
+  service: name=monit
+           state=reloaded
+
+- name: Start monit
+  service: name=monit
+           enabled=yes
+
+- name: Restart monit
+  service: name=monit
+           enabled=yes
+           state=restarted
+
+- name: Restart sshd monit
+  monit: name=sshd
+         state=restarted

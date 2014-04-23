@@ -1,0 +1,4 @@
+#!/bin/bash
+# Deploys the application to all webheads.
+
+ansible-playbook -K -i ./linode webheads.yml --tags "deploy"

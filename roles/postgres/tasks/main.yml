@@ -1,0 +1,60 @@
+---
+- name: Install Postgres Yum repo package
+  ignore_errors: true
+  shell: rpm -Uvh {{ rpm_url }}
+
+- name: Install Postgres packages
+  yum: name="{{ item }}"
+       state=present
+  with_items:
+    - postgresql91
+    - postgresql91-server
+    - postgresql91-devel
+    - postgresql91-libs
+    - postgresql91-contrib
+    - python-psycopg2
+
+- name: Initialize Postgres database
+  shell: /sbin/service postgresql-9.1 initdb
+         creates=/var/lib/pgsql/9.1/data/base
+
+- name: Template postgresql.conf configuration
+  template: src=postgresql.conf
+            dest=/var/lib/pgsql/9.1/data/postgresql.conf
+            owner=postgres
+            group=postgres
+            mode=0644
+            backup=on
+
+- name: Write Postgres monit configuration
+  template: src=postgres.monit
+            dest=/etc/monit.d/postgres.conf
+  notify:
+    - Reload monit
+
+- name: Template pg_hba.conf
+  template: src=pg_hba.conf
+            dest=/var/lib/pgsql/9.1/data/pg_hba.conf
+            owner=postgres
+            group=postgres
+            mode=0644
+            backup=on
+  notify:
+    - Restart postgresql monit
+
+- name: Start postgresql service and chkconfig it on
+  service: name=postgresql-9.1
+           state=started
+           enabled=yes
+
+- name: Create specified Postgres role
+  postgresql_user: name="{{ pg_username }}"
+                   password="{{ pg_password }}"
+                   role_attr_flags=CREATEDB,NOSUPERUSER
+
+- name: Add a Postgres logrotate rule
+  template: src=postgres.logrotate
+            dest=/etc/logrotate.d/postgres
+            owner=root
+            group=root
+            mode=0644

@@ -1,0 +1,7 @@
+base_user: user
+base_user_password: password
+
+monit_alert_email: nobody@dev.null
+logwatch_email: nobody@dev.null
+sshd_port: 22
+zsh_theme: candy

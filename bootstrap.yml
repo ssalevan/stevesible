@@ -1,0 +1,8 @@
+---
+- name: Bootstrap new servers
+  hosts: databases
+  user: root
+
+  roles:
+    - bootstrap
+    - ruby
