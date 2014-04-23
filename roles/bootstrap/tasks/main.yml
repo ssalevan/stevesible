@@ -115,7 +115,7 @@
         shell=/bin/zsh
 
 - name: Create initial user's .ssh directory
-  file: path=/home/herosheets/.ssh
+  file: path=/home/{{ base_user }}/.ssh
         owner="{{ base_user }}"
         group="{{ base_user }}"
         mode=0700
