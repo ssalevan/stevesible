@@ -1,0 +1,6 @@
+---
+check_interval_secs: 10
+
+event_queue_slots: 100
+
+monit_alert_email: root@localhost

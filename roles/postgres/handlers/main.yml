@@ -1,9 +1,7 @@
 ---
-- name: Restart postgresql monit
-  monit: name=postgres
-         state=restarted
+- include: roles/monit/handlers/main.yml
 
-- name: Reload monit
-  service: name=monit
-           enabled=yes
-           state=reloaded
+- name: Restart postgresql monit
+  monit:
+    name: postgres
+    state: restarted

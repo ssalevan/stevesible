@@ -1,0 +1,45 @@
+# {{ ansible_managed }}
+# see http://zookeeper.apache.org/doc/current/zookeeperAdmin.html
+
+# The number of milliseconds of each tick
+tickTime={{ tick_time_millis }}
+
+# The number of ticks that the initial
+# synchronization phase can take
+initLimit={{ num_ticks_init }}
+
+# The number of ticks that can pass between
+# sending a request and getting an acknowledgement
+syncLimit={{ num_ticks_sync }}
+
+# the directory where the snapshot is stored.
+dataDir=/var/lib/zookeeper-{{ site_name | regex_replace(' ', '_') }}
+
+# the port at which the clients will connect
+clientPort={{ client_port }}
+
+# Be sure to read the maintenance section of the
+# administrator guide before turning on autopurge.
+#
+# http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance
+#
+# The number of snapshots to retain in dataDir
+
+#autopurge.snapRetainCount=3
+
+# Purge task interval in hours
+# Set to "0" to disable auto purge feature
+
+# Specify all zookeeper servers
+# The fist port is used by followers to connect to the leader
+# The second one is used for leader election
+
+{% for zookeeper_host in zookeeper_hosts %}
+server.{{ hostvars[zookeeper_host].zookeeper_id }}={{ hostvars[zookeeper_host].ipv4_address | default(hostvars[zookeeper_host]['ansible_default_ipv4']['address']) }}:{{ follower_port }}:{{ leader_election_port }}
+{% endfor %}
+
+# Allow larger than default maximum client connections.
+maxClientCnxns={{ max_client_conns }}
+
+# ZooKeeper and HBase need same session timeout values.
+maxSessionTimeout={{ session_timeout_millis }}

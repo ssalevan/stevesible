@@ -1,19 +1,14 @@
 ---
-- name: Restart nginx monit
-  monit: name=nginx
-         state=restarted
-
-- name: Reload monit
-  service: name=monit
-           enabled=yes
-           state=reloaded
+- include: roles/monit/handlers/main.yml
 
 - name: Reload nginx
-  service: name=nginx
-           enabled=yes
-           state=reloaded
+  service:
+    name: nginx
+    enabled: yes
+    state: reloaded
 
 - name: Ensure nginx is running
-  service: name=nginx
-           enabled=yes
-           state=started
+  service:
+    name: nginx
+    enabled: yes
+    state: started

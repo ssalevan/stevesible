@@ -1,0 +1,69 @@
+---
+- name: Download ZooKeeper tarball
+  command: "curl -o {{ source_dir }}/zookeeper-{{ version }}.tar.gz {{ mirror_base }}/zookeeper/zookeeper-{{ version }}/zookeeper-{{ version }}.tar.gz"
+  args:
+    creates: "{{ source_dir }}/zookeeper-{{ version }}.tar.gz"
+
+- name: Untar ZooKeeper tarball
+  command: "tar xzf {{ source_dir }}/zookeeper-{{ version }}.tar.gz"
+  args:
+    chdir: "{{ source_dir }}"
+    creates: "{{ source_dir }}/zookeeper-{{ version }}"
+
+- name: Create ZooKeeper user's group
+  group:
+    name: "{{ zookeeper_group }}"
+    system: yes
+
+- name: Create ZooKeeper user
+  user:
+    name: "{{ zookeeper_user }}"
+    group: "{{ zookeeper_group }}"
+    system: yes
+
+- name: Ensure that ZooKeeper user owns source directory
+  file:
+    path: "{{ source_dir }}/zookeeper-{{ zookeeper_version }}"
+    owner: "{{ zookeeper_user }}"
+    group: "{{ zookeeper_group }}"
+
+- name: Ensure that ZooKeeper configuration directory exists
+  file:
+    path: /etc/zookeeper
+    ensure: directory
+    group: "{{ zookeeper_group }}"
+    mode: 0755
+
+- name: Ensure that ZooKeeper /var/run directory exists
+  file:
+    path: /var/run/zookeeper
+    ensure: directory
+    group: "{{ zookeeper_group }}"
+    mode: 0775
+
+- name: Ensure that ZooKeeper local state directory exists
+  file:
+    path: "/var/lib/zookeeper-{{ site_name | regex_replace(' ', '_') }}"
+    ensure: directory
+    owner: "{{ zookeeper_user }}"
+    group: "{{ zookeeper_group }}"
+
+- name: Template ZooKeeper configuration
+  template:
+    src: zoo.cfg.j2
+    dest: "/etc/zookeeper/zoo-{{ site_name }}.cfg"
+
+- name: Setup ZooKeeper Monit configuration
+  template:
+    src: zookeeper.monit.j2
+    dest: "/etc/monit.d/zookeeper-{{ site_name | regex_replace(' ', '_') }}"
+  notify:
+    - Reload monit
+
+- name: Ensure that Monit is loaded with latest configuration
+  meta: flush_handlers
+
+- name: Ensure that ZooKeeper is running via Monit
+  monit:
+    name: "zookeeper-{{ site_name | regex_replace(' ', '_') }}"
+    ensure: started

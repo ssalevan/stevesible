@@ -1,6 +1,6 @@
 ---
 - name: Bootstrap new servers
-  hosts: databases
+  hosts: webheads
   user: root
 
   roles:

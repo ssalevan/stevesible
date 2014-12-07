@@ -1,0 +1,31 @@
+---
+- name: Install bootstrap packages
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - monit
+
+- name: Create Monit state directories
+  file:
+    path: /var/lib/monit
+    owner: root
+    group: root
+    mode: 0700
+    state: directory
+
+- name: Establish monit.conf
+  template:
+    src: monit.conf.j2
+    dest: /etc/monit.conf
+    owner: root
+    group: root
+    mode: 0600
+  notify:
+    - Restart monit
+
+- name: Ensure monit service is running
+  service:
+    name: monit
+    state: started
+    enabled: yes
