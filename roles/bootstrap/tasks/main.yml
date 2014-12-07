@@ -40,7 +40,7 @@
     - vim
     - zsh
 
-- include: roles/monit/tasks/main.yml
+- include: ../../monit/tasks/main.yml
 
 - name: Establish MOTD
   template:

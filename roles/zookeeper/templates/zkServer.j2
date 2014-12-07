@@ -1,0 +1,17 @@
+#!/bin/bash
+# {{ ansible_managed }}
+# Provides a site-specific wrapper against ZooKeeper server script for ZK site:
+# {{ site_name }}
+
+{% if jmx_local_only %}
+export JMXLOCALONLY=true
+{% endif %}
+{% if jmx_disable %}
+export JMXDISABLE=true
+{% endif %}
+export JAVA_HOME="{{ jvm_home }}"
+export SERVER_JVMFLAGS="{{ jvm_extra_flags }}"
+export ZOO_LOG_DIR='{{ log_dir }}/{{ site_name | regex_replace(' ', '_') }}'
+export ZOOPIDFILE='/var/run/zookeeper/{{ site_name | regex_replace(' ', '_') }}.pid'
+
+{{ source_dir }}/zookeeper-{{ zookeeper_version }}/bin/zkServer.sh "$@"

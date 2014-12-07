@@ -1,14 +1,14 @@
 ---
 - name: Download ZooKeeper tarball
-  command: "curl -o {{ source_dir }}/zookeeper-{{ version }}.tar.gz {{ mirror_base }}/zookeeper/zookeeper-{{ version }}/zookeeper-{{ version }}.tar.gz"
+  command: "curl -o {{ source_dir }}/zookeeper-{{ zookeeper_version }}.tar.gz {{ mirror_base }}/zookeeper/zookeeper-{{ zookeeper_version }}/zookeeper-{{ zookeeper_version }}.tar.gz"
   args:
-    creates: "{{ source_dir }}/zookeeper-{{ version }}.tar.gz"
+    creates: "{{ source_dir }}/zookeeper-{{ zookeeper_version }}.tar.gz"
 
 - name: Untar ZooKeeper tarball
-  command: "tar xzf {{ source_dir }}/zookeeper-{{ version }}.tar.gz"
+  command: "tar xzf {{ source_dir }}/zookeeper-{{ zookeeper_version }}.tar.gz"
   args:
     chdir: "{{ source_dir }}"
-    creates: "{{ source_dir }}/zookeeper-{{ version }}"
+    creates: "{{ source_dir }}/zookeeper-{{ zookeeper_version }}"
 
 - name: Create ZooKeeper user's group
   group:
@@ -21,49 +21,78 @@
     group: "{{ zookeeper_group }}"
     system: yes
 
-- name: Ensure that ZooKeeper user owns source directory
-  file:
-    path: "{{ source_dir }}/zookeeper-{{ zookeeper_version }}"
-    owner: "{{ zookeeper_user }}"
-    group: "{{ zookeeper_group }}"
-
 - name: Ensure that ZooKeeper configuration directory exists
   file:
     path: /etc/zookeeper
-    ensure: directory
+    state: directory
     group: "{{ zookeeper_group }}"
     mode: 0755
 
-- name: Ensure that ZooKeeper /var/run directory exists
+- name: Ensure that ZooKeeper /var/run directory exists for PID file creation
   file:
     path: /var/run/zookeeper
-    ensure: directory
+    state: directory
     group: "{{ zookeeper_group }}"
     mode: 0775
 
-- name: Ensure that ZooKeeper local state directory exists
+- name: Ensure that site-specific ZooKeeper local state directory exists
   file:
-    path: "/var/lib/zookeeper-{{ site_name | regex_replace(' ', '_') }}"
-    ensure: directory
+    path: "{{ state_dir }}/zookeeper-{{ site_name | regex_replace(' ', '_') }}"
+    state: directory
     owner: "{{ zookeeper_user }}"
     group: "{{ zookeeper_group }}"
 
-- name: Template ZooKeeper configuration
+- name: Ensure that site-specific ZooKeeper log directory exists
+  file:
+    path: "{{ log_dir }}/zookeeper/{{ site_name | regex_replace(' ', '_') }}"
+    state: directory
+    owner: "{{ zookeeper_user }}"
+    group: "{{ zookeeper_group }}"
+
+- name: Template site-specific ZooKeeper configuration
   template:
     src: zoo.cfg.j2
-    dest: "/etc/zookeeper/zoo-{{ site_name }}.cfg"
+    dest: "/etc/zookeeper/zoo-{{ site_name | regex_replace(' ', '_') }}.cfg"
+  notify:
+    - Reload monit
+    - Restart ZooKeeper via Monit
+  tags:
+    - config
 
-- name: Setup ZooKeeper Monit configuration
+- name: Template site-specific ZooKeeper server startup script
+  template:
+    src: zkServer.j2
+    dest: "/usr/bin/zkServer-{{ site_name | regex_replace(' ', '_') }}"
+    owner: root
+    group: root
+    mode: 0755
+  notify:
+    - Reload monit
+    - Restart ZooKeeper via Monit
+  tags:
+    - config
+
+- name: Setup site-specific ZooKeeper Monit configuration
   template:
     src: zookeeper.monit.j2
     dest: "/etc/monit.d/zookeeper-{{ site_name | regex_replace(' ', '_') }}"
   notify:
     - Reload monit
+  tags:
+    - config
 
 - name: Ensure that Monit is loaded with latest configuration
   meta: flush_handlers
 
-- name: Ensure that ZooKeeper is running via Monit
+- name: Ensure that site-specific ZooKeeper is running via Monit
   monit:
     name: "zookeeper-{{ site_name | regex_replace(' ', '_') }}"
-    ensure: started
+    state: started
+
+- name: Write site-specific ZooKeeper logrotate
+  template:
+    src: zookeeper.logrotate.j2
+    dest: "/etc/logrotate.d/zookeeper-{{ site_name | regex_replace(' ', '_') }}"
+    owner: root
+    group: root
+    mode: 0644

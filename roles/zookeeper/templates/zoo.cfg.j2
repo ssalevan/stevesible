@@ -1,4 +1,5 @@
 # {{ ansible_managed }}
+
 # see http://zookeeper.apache.org/doc/current/zookeeperAdmin.html
 
 # The number of milliseconds of each tick
@@ -6,14 +7,14 @@ tickTime={{ tick_time_millis }}
 
 # The number of ticks that the initial
 # synchronization phase can take
-initLimit={{ num_ticks_init }}
+initLimit={{ num_init_ticks }}
 
 # The number of ticks that can pass between
 # sending a request and getting an acknowledgement
-syncLimit={{ num_ticks_sync }}
+syncLimit={{ num_sync_ticks }}
 
 # the directory where the snapshot is stored.
-dataDir=/var/lib/zookeeper-{{ site_name | regex_replace(' ', '_') }}
+dataDir={{ state_dir }}/zookeeper-{{ site_name | regex_replace(' ', '_') }}
 
 # the port at which the clients will connect
 clientPort={{ client_port }}

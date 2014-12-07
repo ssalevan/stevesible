@@ -1,5 +1,5 @@
 ---
-- include: roles/monit/handlers/main.yml
+- include: ../../monit/handlers/main.yml
 
 - name: Reload nginx
   service:

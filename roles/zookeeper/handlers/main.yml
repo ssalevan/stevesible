@@ -1,2 +1,7 @@
 ---
-- include: roles/monit/handlers/main.yml
+- include: ../../monit/handlers/main.yml
+
+- name: Restart ZooKeeper via Monit
+  monit:
+    name: zookeeper-{{ site_name | regex_replace(' ', '_') }}
+    state: restarted

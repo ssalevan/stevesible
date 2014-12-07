@@ -1,5 +1,5 @@
 ---
-- name: Install bootstrap packages
+- name: Install Monit packages
   yum:
     name: "{{ item }}"
     state: installed
@@ -24,7 +24,7 @@
   notify:
     - Restart monit
 
-- name: Ensure monit service is running
+- name: Ensure Monit service is running
   service:
     name: monit
     state: started

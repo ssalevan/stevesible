@@ -1,5 +1,5 @@
 # {{ ansible_managed }}
 
 check process zookeeper-{{ site_name | regex_replace(' ', '_') }} with pidfile /var/run/zookeeper/{{ site_name | regex_replace(' ', '_') }}.pid
-  start program = "/usr/bin/env ZOOPIDFILE='/var/run/zookeeper/{{ site_name | regex_replace(' ', '_') }}.pid' {{ source_dir }}/zookeeper-{{ zookeeper_version }}/bin/zkServer.sh start'
-  stop program = "/usr/bin/env ZOOPIDFILE='/var/run/zookeeper/{{ site_name | regex_replace(' ', '_') }}.pid' {{ source_dir }}/zookeeper-{{ zookeeper_version }}/bin/zkServer.sh stop'
+  start program = "/usr/bin/zkServer-{{ site_name | regex_replace(' ', '_') }} start /etc/zookeeper/zoo-{{ site_name | regex_replace(' ', '_') }}.cfg"
+  stop program = "/usr/bin/zkServer-{{ site_name | regex_replace(' ', '_') }} stop /etc/zookeeper/zoo-{{ site_name | regex_replace(' ', '_') }}.cfg'

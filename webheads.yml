@@ -5,4 +5,4 @@
   sudo: true
 
   roles:
-    - nginx
+    - zookeeper

@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+
+{{ log_dir }}/{{ site_name | regex_replace(' ', '_') }}/* {
+
+  weekly
+  rotate 10
+  copytruncate
+  delaycompress
+  compress
+  notifempty
+  missingok
+
+}

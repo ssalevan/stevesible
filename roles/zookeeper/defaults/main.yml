@@ -3,7 +3,15 @@ client_port: 2181
 follower_port: 2888
 leader_election_port: 3888
 
+jmx_local_only: true
+jmx_disable: false
+
+jvm_extra_flags: ""
+jvm_home: /usr/lib/jvm/java
+
 max_client_conns: 200
+
+mirror_base: http://mirror.cogentco.com/pub/apache/
 
 num_init_ticks: 10
 num_sync_ticks: 5
@@ -13,7 +21,11 @@ tick_time_millis: 5000
 
 site_name: main
 
+log_dir: /var/log/zookeeper
+state_dir: /var/lib
 source_dir: /usr/src
+
+zookeeper_hosts: []
 
 zookeeper_group: zookeeper
 zookeeper_user: zookeeper
