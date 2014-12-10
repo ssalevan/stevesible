@@ -26,6 +26,9 @@ state_dir: /var/lib
 source_dir: /usr/src
 
 zookeeper_hosts: []
+host_identifier: ansible_eth0
+identifier_is_ip: true
+host_ip_type: ipv4
 
 zookeeper_group: zookeeper
 zookeeper_user: zookeeper

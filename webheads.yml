@@ -1,8 +1,9 @@
 ---
 - name: Establishes and maintains a webhead node
   hosts: webheads
-  user: baseuser
+  user: novauser
   sudo: true
 
   roles:
-    - zookeeper
+    - role: zookeeper
+      zookeeper_hosts: "{{ groups['webheads'] }}"

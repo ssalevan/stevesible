@@ -1,0 +1,11 @@
+{%- for zookeeper_host in zookeeper_hosts|sort -%}
+{%- if identifier_is_ip -%}
+{%- if zookeeper_host == hostvars[inventory_hostname][host_identifier][host_ip_type]['address'] -%}
+{{ loop.index }}
+{%- endif -%}
+{%- else -%}
+{%- if zookeeper_host == hostvars[inventory_hostname][host_identifier] -%}
+{{ loop.index }}
+{%- endif -%}
+{%- endif -%}
+{%- endfor -%}

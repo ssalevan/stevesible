@@ -3,5 +3,5 @@
 
 - name: Restart ZooKeeper via Monit
   monit:
-    name: zookeeper-{{ site_name | regex_replace(' ', '_') }}
+    name: zookeeper-{{ safe_zookeeper_site_name }}
     state: restarted

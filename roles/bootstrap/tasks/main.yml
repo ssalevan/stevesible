@@ -1,7 +1,7 @@
 ---
 - name: Bootstrap ansible-bootstrap-epel Yum repository
-  copy:
-    src: ansible-bootstrap-epel.repo
+  template:
+    src: ansible-bootstrap-epel.repo.j2
     dest: /etc/yum.repos.d/ansible-bootstrap-epel.repo
     owner: root
     group: root

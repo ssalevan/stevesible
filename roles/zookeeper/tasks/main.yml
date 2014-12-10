@@ -1,4 +1,8 @@
 ---
+- name: Ensure that ZooKeeper site name is templatable
+  set_fact:
+    safe_zookeeper_site_name: "{{ site_name | regex_replace(' ', '_') }}"
+
 - name: Download ZooKeeper tarball
   command: "curl -o {{ source_dir }}/zookeeper-{{ zookeeper_version }}.tar.gz {{ mirror_base }}/zookeeper/zookeeper-{{ zookeeper_version }}/zookeeper-{{ zookeeper_version }}.tar.gz"
   args:
@@ -19,50 +23,55 @@
   user:
     name: "{{ zookeeper_user }}"
     group: "{{ zookeeper_group }}"
+    home: "{{ state_dir }}/zookeeper/{{ safe_zookeeper_site_name }}"
+    createhome: no
     system: yes
 
-- name: Ensure that ZooKeeper configuration directory exists
+- name: Ensure that the ZooKeeper configuration directory exists
   file:
     path: /etc/zookeeper
     state: directory
     group: "{{ zookeeper_group }}"
     mode: 0755
 
-- name: Ensure that ZooKeeper /var/run directory exists for PID file creation
+- name: Ensure that the ZooKeeper /var/run directory exists for PID file creation
   file:
     path: /var/run/zookeeper
     state: directory
+    recurse: yes
     group: "{{ zookeeper_group }}"
     mode: 0775
 
-- name: Ensure that site-specific ZooKeeper local state directory exists
+- name: Ensure that the site-specific ZooKeeper state directory exists
   file:
-    path: "{{ state_dir }}/zookeeper-{{ site_name | regex_replace(' ', '_') }}"
+    path: "{{ state_dir }}/zookeeper/{{ safe_zookeeper_site_name }}"
     state: directory
+    recurse: yes
     owner: "{{ zookeeper_user }}"
     group: "{{ zookeeper_group }}"
 
-- name: Ensure that site-specific ZooKeeper log directory exists
-  file:
-    path: "{{ log_dir }}/zookeeper/{{ site_name | regex_replace(' ', '_') }}"
-    state: directory
-    owner: "{{ zookeeper_user }}"
-    group: "{{ zookeeper_group }}"
-
-- name: Template site-specific ZooKeeper configuration
+- name: Ensure that the ZooKeeper myid file reflects the correct ID of the server
   template:
-    src: zoo.cfg.j2
-    dest: "/etc/zookeeper/zoo-{{ site_name | regex_replace(' ', '_') }}.cfg"
+    src: myid.j2
+    dest: "{{ state_dir }}/zookeeper/{{ safe_zookeeper_site_name }}/myid"
+    owner: "{{ zookeeper_user }}"
+    group: "{{ zookeeper_group }}"
   notify:
-    - Reload monit
     - Restart ZooKeeper via Monit
   tags:
     - config
 
-- name: Template site-specific ZooKeeper server startup script
+- name: Ensure that the site-specific ZooKeeper log directory exists
+  file:
+    path: "{{ log_dir }}/zookeeper/{{ safe_zookeeper_site_name }}"
+    state: directory
+    owner: "{{ zookeeper_user }}"
+    group: "{{ zookeeper_group }}"
+
+- name: Template a site-specific ZooKeeper server startup script
   template:
     src: zkServer.j2
-    dest: "/usr/bin/zkServer-{{ site_name | regex_replace(' ', '_') }}"
+    dest: "/usr/bin/zkServer-{{ safe_zookeeper_site_name }}"
     owner: root
     group: root
     mode: 0755
@@ -72,10 +81,20 @@
   tags:
     - config
 
-- name: Setup site-specific ZooKeeper Monit configuration
+- name: Template a site-specific ZooKeeper configuration
+  template:
+    src: zoo.cfg.j2
+    dest: "/etc/zookeeper/{{ safe_zookeeper_site_name }}.cfg"
+  notify:
+    - Reload monit
+    - Restart ZooKeeper via Monit
+  tags:
+    - config
+
+- name: Setup a site-specific ZooKeeper Monit configuration
   template:
     src: zookeeper.monit.j2
-    dest: "/etc/monit.d/zookeeper-{{ site_name | regex_replace(' ', '_') }}"
+    dest: "/etc/monit.d/zookeeper-{{ safe_zookeeper_site_name }}"
   notify:
     - Reload monit
   tags:
@@ -84,15 +103,15 @@
 - name: Ensure that Monit is loaded with latest configuration
   meta: flush_handlers
 
-- name: Ensure that site-specific ZooKeeper is running via Monit
+- name: Ensure that the site-specific ZooKeeper is running via Monit
   monit:
-    name: "zookeeper-{{ site_name | regex_replace(' ', '_') }}"
+    name: "zookeeper-{{ safe_zookeeper_site_name }}"
     state: started
 
-- name: Write site-specific ZooKeeper logrotate
+- name: Write a site-specific ZooKeeper logrotate
   template:
     src: zookeeper.logrotate.j2
-    dest: "/etc/logrotate.d/zookeeper-{{ site_name | regex_replace(' ', '_') }}"
+    dest: "/etc/logrotate.d/zookeeper-{{ safe_zookeeper_site_name }}"
     owner: root
     group: root
     mode: 0644

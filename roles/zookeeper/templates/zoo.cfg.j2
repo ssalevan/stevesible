@@ -14,29 +14,14 @@ initLimit={{ num_init_ticks }}
 syncLimit={{ num_sync_ticks }}
 
 # the directory where the snapshot is stored.
-dataDir={{ state_dir }}/zookeeper-{{ site_name | regex_replace(' ', '_') }}
+dataDir={{ state_dir }}/zookeeper/{{ safe_zookeeper_site_name }}
 
 # the port at which the clients will connect
 clientPort={{ client_port }}
 
-# Be sure to read the maintenance section of the
-# administrator guide before turning on autopurge.
-#
-# http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance
-#
-# The number of snapshots to retain in dataDir
-
-#autopurge.snapRetainCount=3
-
-# Purge task interval in hours
-# Set to "0" to disable auto purge feature
-
-# Specify all zookeeper servers
-# The fist port is used by followers to connect to the leader
-# The second one is used for leader election
-
-{% for zookeeper_host in zookeeper_hosts %}
-server.{{ hostvars[zookeeper_host].zookeeper_id }}={{ hostvars[zookeeper_host].ipv4_address | default(hostvars[zookeeper_host]['ansible_default_ipv4']['address']) }}:{{ follower_port }}:{{ leader_election_port }}
+# ZooKeeper servers in quorum:
+{% for zookeeper_host in zookeeper_hosts|sort %}
+server.{{ loop.index }}={{ zookeeper_host }}:{{ follower_port }}:{{ leader_election_port }}
 {% endfor %}
 
 # Allow larger than default maximum client connections.
