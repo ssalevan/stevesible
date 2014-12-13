@@ -76,7 +76,7 @@
     group: root
     mode: 0755
   notify:
-    - Reload monit
+    - Reload Monit
     - Restart ZooKeeper via Monit
   tags:
     - config
@@ -86,7 +86,7 @@
     src: zoo.cfg.j2
     dest: "/etc/zookeeper/{{ safe_zookeeper_site_name }}.cfg"
   notify:
-    - Reload monit
+    - Reload Monit
     - Restart ZooKeeper via Monit
   tags:
     - config
@@ -96,7 +96,7 @@
     src: zookeeper.monit.j2
     dest: "/etc/monit.d/zookeeper-{{ safe_zookeeper_site_name }}"
   notify:
-    - Reload monit
+    - Reload Monit
   tags:
     - config
 

@@ -30,7 +30,7 @@
     src: nginx.monit.j2
     dest: /etc/monit.d/nginx.conf
   notify:
-    - Reload monit
+    - Reload Monit
 
 - name: Ensure nginx service running
   service:

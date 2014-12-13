@@ -1,0 +1,7 @@
+---
+- name: Install Monit packages
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - monit

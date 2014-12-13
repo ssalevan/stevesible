@@ -1,9 +1,14 @@
 ---
 galaxy_info:
   author: Steve Salevan <steve.salevan@gmail.com>
-  description: Installs and configures Apache ZooKeeper
+  description: Installs and configures Docker
   license: Apache 2
   min_ansible_version: 1.2
+  categories:
+    - cloud
+    - system
 
 dependencies:
+  - role: apt
+  - role: epel
   - role: monit

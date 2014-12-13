@@ -1,0 +1,7 @@
+---
+- name: Ensure that Docker and its dependencies are installed
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - docker-io

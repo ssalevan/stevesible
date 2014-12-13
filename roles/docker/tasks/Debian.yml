@@ -1,0 +1,19 @@
+---
+- name: Add docker.io apt key
+  apt_key:
+    keyserver: 'keyserver.ubuntu.com'
+    id: A88D21E9
+    state: present
+
+- name: Add docker.io Ubuntu apt repository (works on Debian as well)
+  apt_repository:
+    repo: 'deb https://get.docker.io/ubuntu docker main'
+    state: present
+
+- name: Make sure that Docker and its dependencies are installed
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items:
+    - lxc-docker

@@ -1,0 +1,2 @@
+---
+- include: ../../monit/handlers/main.yml

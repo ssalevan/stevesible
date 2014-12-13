@@ -1,10 +1,9 @@
 ---
-- name: Install Monit packages
-  yum:
-    name: "{{ item }}"
-    state: installed
-  with_items:
-    - monit
+- include: Debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: RedHat.yml
+  when: ansible_os_family == "RedHat"
 
 - name: Create Monit state directories
   file:
