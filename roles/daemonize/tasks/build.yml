@@ -1,0 +1,31 @@
+---
+- name: Checkout Daemonize source
+  git:
+    repo: "{{ daemonize_git_repo }}"
+    dest: "{{ source_dir }}/daemonize"
+  tags:
+    - daemonize_rebuild
+
+- name: Configure Daemonize Makefile
+  command: ./configure
+  args:
+    chdir: "{{ source_dir }}/daemonize"
+    creates: "{{ source_dir }}/daemonize/Makefile"
+  tags:
+    - daemonize_rebuild
+
+- name: Build Daemonize
+  command: make
+  args:
+    chdir: "{{ source_dir }}/daemonize"
+    creates: "{{ source_dir }}/daemonize/daemonize"
+  tags:
+    - daemonize_rebuild
+
+- name: Ensure that newly-built Daemonize is installed
+  command: make install
+  args:
+    chdir: "{{ source_dir }}/daemonize"
+    creates: "/usr/local/bin/daemonize"
+  tags:
+    - daemonize_rebuild

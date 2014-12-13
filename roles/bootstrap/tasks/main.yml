@@ -7,8 +7,6 @@
     - collectd
     - fail2ban
     - ferm
-    - git
-    - git-core
     - htop
     - iftop
     - java-1.7.0-openjdk

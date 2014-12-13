@@ -1,0 +1,8 @@
+---
+- name: Install Git
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - git
+    - git-core

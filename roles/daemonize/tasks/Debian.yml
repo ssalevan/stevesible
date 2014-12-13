@@ -1,0 +1,6 @@
+---
+- name: Ensure that necessary build tools are installed
+  apt: name="{{ item }}"
+       state=latest
+  with_items:
+    - build-essential

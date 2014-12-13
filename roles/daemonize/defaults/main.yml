@@ -1,0 +1,5 @@
+---
+build_from_source: false
+
+daemonize_git_repo: https://github.com/bmc/daemonize.git
+source_dir: /usr/src

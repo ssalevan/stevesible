@@ -3,6 +3,8 @@ client_port: 2181
 follower_port: 2888
 leader_election_port: 3888
 
+failure_cycles_before_restart: 2
+
 jmx_local_only: true
 jmx_disable: false
 

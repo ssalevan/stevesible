@@ -1,0 +1,11 @@
+---
+galaxy_info:
+  author: Steve Salevan <steve.salevan@gmail.com>
+  description: Installs Daemonize daemonization tool
+  license: Apache 2
+  min_ansible_version: 1.2
+
+dependencies:
+  - role: apt
+  - role: epel
+  - role: git
