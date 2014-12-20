@@ -1,0 +1,7 @@
+---
+- name: Ensure that LSB environment is installed
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - redhat-lsb

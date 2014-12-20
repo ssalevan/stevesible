@@ -1,0 +1,169 @@
+#!/bin/bash
+# {{ ansible_managed }}
+# Controls a Mesos process for cluster '{{ mesos_cluster_name }}'.
+
+function usage {
+  err "Controls a Mesos process for cluster '{{ mesos_cluster_name }}'."
+  err "Usage: ${0} (master|slave) (start|stop|status)"
+}
+
+function msg {
+  out "$*" >&2;
+}
+
+function err {
+  local x=${?};
+  msg "$*";
+  return $(( ${x} == 0 ? 1 : ${x} ));
+}
+
+function out {
+  printf '%s\n' "$*";
+}
+
+# Source function library.
+. /lib/lsb/init-functions
+
+# Get a sane screen width
+[ -z "${COLUMNS:-}" ] && COLUMNS=80
+[ -z "${CONSOLETYPE:-}" ] && CONSOLETYPE="$(/sbin/consoletype)"
+
+# Read in init configuration.
+if [ -z "${BOOTUP:-}" ]; then
+  if [ -f /etc/sysconfig/init ]; then
+    . /etc/sysconfig/init
+  else
+    BOOTUP=color
+    RES_COL=60
+    MOVE_TO_COL="echo -en \\033[${RES_COL}G"
+    SETCOLOR_SUCCESS="echo -en \\033[1;32m"
+    SETCOLOR_FAILURE="echo -en \\033[1;31m"
+    SETCOLOR_WARNING="echo -en \\033[1;33m"
+    SETCOLOR_NORMAL="echo -en \\033[0;39m"
+    LOGLEVEL=1
+  fi
+  if [ "$CONSOLETYPE" = "serial" ]; then
+    BOOTUP=serial
+    MOVE_TO_COL=
+    SETCOLOR_SUCCESS=
+    SETCOLOR_FAILURE=
+    SETCOLOR_WARNING=
+    SETCOLOR_NORMAL=
+  fi
+fi
+
+function echo_success {
+  [ "$BOOTUP" = "color" ] && $MOVE_TO_COL
+  echo -n "["
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_SUCCESS
+  echo -n $"  OK  "
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+  echo -n "]"
+  echo -ne "\r"
+  return 0
+}
+
+function echo_failure {
+  [ "$BOOTUP" = "color" ] && $MOVE_TO_COL
+  echo -n "["
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_FAILURE
+  echo -n $"FAILED"
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+  echo -n "]"
+  echo -ne "\r"
+  return 1
+}
+
+# Parse arguments.
+ROLE=${1}
+ACTION=${2}
+
+# Ensures that action and role are specified.
+if [ -z ${ACTION} -o -z ${ROLE} ]; then
+  if [ -z ${ACTION} ]; then
+    err "ERROR: No action specified."
+  fi
+  if [ -z ${ROLE} ]; then
+    err "ERROR: No role specified."
+  fi
+  usage
+  exit -1
+fi
+
+STATE_DIR='{{ mesos_state_dir }}/{{ safe_mesos_cluster_name }}'
+LOG_DIR='{{ mesos_log_dir }}/{{ safe_mesos_cluster_name }}'
+
+function start {
+  echo -n $"Starting Mesos ${ROLE} for cluster '{{ mesos_cluster_name }}': "
+  start_daemon daemonize -p "${STATE_DIR}/${ROLE}.pid" -o "${LOG_DIR}/${ROLE}/stdout.log" -e "${LOG_DIR}/${ROLE}/stderr.log" /usr/bin/mesos-init-wrapper ${ROLE}
+  retval=$?
+  [ $retval -eq 0 ] && (echo_success; touch ${STATE_DIR}/${ROLE}.lock) || echo_failure
+  echo
+  return $retval
+}
+
+function stop {
+  echo -n $"Stopping Mesos ${ROLE} for cluster '{{ mesos_cluster_name }}': "
+  killproc -p "${STATE_DIR}/${ROLE}.pid" /usr/local/sbin/mesos-${ROLE}
+  retval=$?
+  [ $retval -eq 0 ] && (echo_success; rm -f ${STATE_DIR}/${ROLE}.lock) || echo_failure
+  echo
+  return $retval
+}
+
+function restart {
+  stop
+  start
+}
+
+function rh_status {
+  pid=$(pidofproc -p ${STATE_DIR}/${ROLE}.pid /usr/local/sbin/mesos-${ROLE})
+  if [ $? -eq 0 ]; then
+    echo "mesos-${ROLE} (pid ${pid}) is running for cluster '{{ mesos_cluster_name }}'..."
+    return 0
+  else
+    if [ -e ${STATE_DIR}/${ROLE}.lock ]; then
+      echo "mesos-${ROLE} process dead but lockfile exists for cluster '{{ mesos_cluster_name }}'"
+      return 2
+    else
+      echo "mesos-${ROLE} is stopped for cluster '{{ mesos_cluster_name }}'"
+      return 1
+    fi
+  fi
+}
+
+rh_status_q() {
+  rh_status >/dev/null 2>&1
+}
+
+# Ensures that Mesos role is sane.
+case "${ROLE}" in
+  master|slave)
+    ;;
+  *)
+    err "ERROR: Invalid Mesos role specified."
+    usage
+    exit -2
+esac
+
+# Executes the requested daemon action.
+case "${ACTION}" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  status)
+    rh_status
+    ;;
+  restart)
+    restart
+    ;;
+  *)
+    err "ERROR: Invalid action specified."
+    usage
+    exit -3
+esac
+
+exit $?

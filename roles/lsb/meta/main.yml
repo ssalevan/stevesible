@@ -1,0 +1,6 @@
+---
+galaxy_info:
+  author: Steve Salevan <steve.salevan@gmail.com>
+  description: Ensures that an LSB environment exists
+  license: Apache 2
+  min_ansible_version: 1.2

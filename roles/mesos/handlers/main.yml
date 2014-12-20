@@ -1,0 +1,12 @@
+---
+- include: ../../monit/handlers/main.yml
+
+- name: Restart Mesos master via Monit
+  monit:
+    name: mesos-master-{{ safe_mesos_cluster_name }}
+    state: restarted
+
+- name: Restart Mesos slave via Monit
+  monit:
+    name: mesos-slave-{{ safe_mesos_cluster_name }}
+    state: restarted

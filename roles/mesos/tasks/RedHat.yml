@@ -1,0 +1,12 @@
+---
+- name: Ensure that Mesosphere repository is installed
+  yum:
+    name: "{{ mesos_repo_rpm }}"
+    state: present
+
+- name: Ensure that Mesos and its dependencies are installed
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ mesos_pkgname }}"

@@ -1,0 +1,20 @@
+
+---
+- name: Add Mesosphere repository's Apt key
+  apt_key:
+    id: "{{ mesosphere_debian_key_id }}"
+    keyserver: keyserver.ubuntu.com
+    state: present
+
+- name: Add Mesosphere repository
+  apt_repository:
+    repo: "deb http://repos.mesosphere.io/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} main"
+    state: present
+
+- name: Install Debian OS packages
+  apt:
+    pkg: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items:
+    - "{{ mesos_pkgname }}"

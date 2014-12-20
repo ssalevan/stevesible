@@ -1,0 +1,33 @@
+---
+mesos_cluster_name: main
+mesos_version: latest
+
+mesos_roles:
+  - master
+  - slave
+
+mesos_ip: "{{ ansible_default_ipv4.address }}"
+mesos_hostname: "{{ inventory_hostname }}"
+
+mesos_master_port: 5050
+mesos_slave_port: 5051
+
+mesos_log_dir: /var/log/mesos
+mesos_state_dir: /var/run/mesos
+mesos_work_dir: /var/mesos
+
+mesos_quorum_size: 1
+mesos_ulimit_options: "-n 8192"
+
+mesos_repo_rpm: "http://repos.mesosphere.io/el/6/noarch/RPMS/mesosphere-el-repo-6-2.noarch.rpm"
+
+mesos_zookeeper_quorum: []
+mesos_zookeeper_port: 2181
+
+mesos_zookeeper_username: ""
+mesos_zookeeper_password: ""
+mesos_zookeeper_znode: "/mesos/{{ mesos_cluster_name }}"
+
+mesos_debian_key_id: E56151BF
+
+failure_cycles_before_restart: 2

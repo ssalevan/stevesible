@@ -1,0 +1,145 @@
+---
+- name: Ensure that cluster name is an a templatable state
+  set_fact:
+    safe_mesos_cluster_name: "{{ mesos_cluster_name | regex_replace(' ', '_') }}"
+
+- name: Ensure that the appropriate Mesos package name is selected
+  set_fact:
+    mesos_pkgname: "mesos-{{ mesos_version }}"
+  when: mesos_version != "latest"
+
+- name: Ensure that Mesos-specific facts are set
+  set_fact:
+    mesos_pkgname: mesos
+  when: mesos_version == "latest"
+
+- include: Debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: RedHat.yml
+  when: ansible_os_family == "RedHat"
+
+- name: Ensure that Mesos master work directory exists
+  file:
+    path: "{{ mesos_work_dir }}/{{ safe_mesos_cluster_name }}/master"
+    state: directory
+    recurse: yes
+  when: '"master" in mesos_roles'
+
+- name: Ensure that Mesos slave work directory exists
+  file:
+    path: "{{ mesos_work_dir }}/{{ safe_mesos_cluster_name }}/slave"
+    state: directory
+    recurse: yes
+  when: '"slave" in mesos_roles'
+
+- name: Ensure that Mesos master log directory exists
+  file:
+    path: "{{ mesos_log_dir }}/{{ safe_mesos_cluster_name }}/master"
+    state: directory
+    recurse: yes
+  when: '"master" in mesos_roles'
+
+- name: Ensure that Mesos slave log directory exists
+  file:
+    path: "{{ mesos_log_dir }}/{{ safe_mesos_cluster_name }}/slave"
+    state: directory
+    recurse: yes
+  when: '"slave" in mesos_roles'
+
+- name: Ensure that Mesos master state directory exists
+  file:
+    path: "{{ mesos_state_dir }}/{{ safe_mesos_cluster_name }}/master"
+    state: directory
+    recurse: yes
+  when: '"master" in mesos_roles'
+
+- name: Ensure that Mesos slave state directory exists
+  file:
+    path: "{{ mesos_state_dir }}/{{ safe_mesos_cluster_name }}/slave"
+    state: directory
+    recurse: yes
+  when: '"slave" in mesos_roles'
+
+- name: Template Mesos ZooKeeper quorum file
+  template:
+    src: zk.j2
+    dest: /etc/mesos/zk
+  tags:
+    - config
+
+- name: Template Mesos base /etc/default file
+  template:
+    src: base-defaults.j2
+    dest: /etc/default/mesos
+  tags:
+    - config
+
+- name: Template Mesos master /etc/default file
+  template:
+    src: master-defaults.j2
+    dest: /etc/default/mesos-master
+  notify:
+    - Restart Mesos master via Monit
+  when: '"master" in mesos_roles'
+  tags:
+    - config
+
+- name: Template Mesos slave /etc/default file
+  template:
+    src: slave-defaults.j2
+    dest: /etc/default/mesos-slave
+  notify:
+    - Restart Mesos slave via Monit
+  when: '"slave" in mesos_roles'
+  tags:
+    - config
+
+- name: Template Mesos cluster daemon control script
+  template:
+    src: mesos-control.sh.j2
+    dest: "/usr/bin/mesos-{{ safe_mesos_cluster_name }}"
+    mode: 0755
+
+- name: Setup a Monit configuration for the Mesos master
+  template:
+    src: mesos-master.monit.j2
+    dest: "/etc/monit.d/mesos-{{ safe_mesos_cluster_name }}-master"
+  notify:
+    - Reload Monit
+  when: '"master" in mesos_roles'
+  tags:
+    - config
+
+- name: Setup a Monit configuration for the Mesos slave
+  template:
+    src: mesos-slave.monit.j2
+    dest: "/etc/monit.d/mesos-{{ safe_mesos_cluster_name }}-slave"
+  notify:
+    - Reload Monit
+  when: '"slave" in mesos_roles'
+  tags:
+    - config
+
+- name: Ensure that Monit is loaded with latest configuration
+  meta: flush_handlers
+  tags:
+    - config
+
+- name: Ensure that the Mesos master is running via Monit
+  monit:
+    name: "mesos-master-{{ safe_mesos_cluster_name }}"
+    state: started
+  when: '"master" in mesos_roles'
+
+- name: Ensure that the Mesos slave is running via Monit
+  monit:
+    name: "mesos-slave-{{ safe_mesos_cluster_name }}"
+    state: started
+  when: '"slave" in mesos_roles'
+
+- name: Write a Mesos logrotate
+  template:
+    src: mesos.logrotate.j2
+    dest: "/etc/logrotate.d/mesos-{{ safe_mesos_cluster_name }}"
+    mode: 0644

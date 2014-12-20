@@ -1,0 +1,10 @@
+# {{ ansible_managed }}
+# Sets default settings for any Mesos-related daemon.
+
+CLUSTER='{{ mesos_cluster_name }}'
+IP='{{ mesos_ip }}'
+ULIMIT='{{ mesos_ulimit_options }}'
+
+# Mesos environment variables to set
+# see http://mesos.apache.org/documentation/latest/configuration/
+export MESOS_HOSTNAME='{{ mesos_hostname }}'

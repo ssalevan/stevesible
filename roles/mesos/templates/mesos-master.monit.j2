@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+# Ensures that daemon running Mesos master daemon for cluster '{{ mesos_cluster_name }}' is monitored.
+
+check process mesos-{{ safe_mesos_cluster_name }}-master with pidfile /var/run/mesos/{{ safe_mesos_cluster_name }}/master.pid
+  if failed port {{ mesos_master_port }} type tcp for {{ failure_cycles_before_restart }} cycles then restart
+  start program = "/usr/bin/mesos-{{ safe_mesos_cluster_name }} master start"
+  stop program = "/usr/bin/mesos-{{ safe_mesos_cluster_name }} master stop"

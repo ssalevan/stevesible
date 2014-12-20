@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+
+{{ mesos_log_dir }}/{{ safe_mesos_cluster_name }}/*/*.log {
+
+  daily
+  missingok
+  rotate 30
+  compress
+  delaycompress
+  notifempty
+  copytruncate
+
+}
