@@ -1,6 +1,7 @@
 # {{ ansible_managed }}
 # Sets default settings for a Mesos master daemon for cluster '{{ mesos_cluster_name }}'.
 
-LOGDIR='{{ mesos_log_dir }}/{{ safe_mesos_cluster_name }}/master'
+LOGS='{{ mesos_log_dir }}/{{ safe_mesos_cluster_name }}/master'
 
 export MESOS_PORT='{{ mesos_master_port }}'
+export MESOS_WORK_DIR="{{ mesos_work_dir }}/{{ safe_mesos_cluster_name }}/master"

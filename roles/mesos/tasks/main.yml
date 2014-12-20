@@ -61,6 +61,14 @@
     recurse: yes
   when: '"slave" in mesos_roles'
 
+- name: Ensure that prepackaged Mesos state files are removed
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /etc/mesos-master/quorum
+    - /etc/mesos-master/work_dir
+
 - name: Template Mesos ZooKeeper quorum file
   template:
     src: zk.j2
@@ -128,13 +136,13 @@
 
 - name: Ensure that the Mesos master is running via Monit
   monit:
-    name: "mesos-master-{{ safe_mesos_cluster_name }}"
+    name: "mesos-{{ safe_mesos_cluster_name }}-master"
     state: started
   when: '"master" in mesos_roles'
 
 - name: Ensure that the Mesos slave is running via Monit
   monit:
-    name: "mesos-slave-{{ safe_mesos_cluster_name }}"
+    name: "mesos-{{ safe_mesos_cluster_name }}-slave"
     state: started
   when: '"slave" in mesos_roles'
 
