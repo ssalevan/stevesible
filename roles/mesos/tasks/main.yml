@@ -2,22 +2,32 @@
 - name: Ensure that cluster name is an a templatable state
   set_fact:
     safe_mesos_cluster_name: "{{ mesos_cluster_name | regex_replace(' ', '_') }}"
+  tags:
+    - mesos
 
 - name: Ensure that the appropriate Mesos package name is selected
   set_fact:
     mesos_pkgname: "mesos-{{ mesos_version }}"
   when: mesos_version != "latest"
+  tags:
+    - mesos
 
 - name: Ensure that Mesos-specific facts are set
   set_fact:
     mesos_pkgname: mesos
   when: mesos_version == "latest"
+  tags:
+    - mesos
 
 - include: Debian.yml
   when: ansible_os_family == "Debian"
+  tags:
+    - mesos
 
 - include: RedHat.yml
   when: ansible_os_family == "RedHat"
+  tags:
+    - mesos
 
 - name: Ensure that Mesos master work directory exists
   file:
@@ -25,6 +35,9 @@
     state: directory
     recurse: yes
   when: '"master" in mesos_roles'
+  tags:
+    - mesos
+    - mesos_master
 
 - name: Ensure that Mesos slave work directory exists
   file:
@@ -32,6 +45,9 @@
     state: directory
     recurse: yes
   when: '"slave" in mesos_roles'
+  tags:
+    - mesos
+    - mesos_slave
 
 - name: Ensure that Mesos master log directory exists
   file:
@@ -39,6 +55,9 @@
     state: directory
     recurse: yes
   when: '"master" in mesos_roles'
+  tags:
+    - mesos
+    - mesos_master
 
 - name: Ensure that Mesos slave log directory exists
   file:
@@ -46,6 +65,9 @@
     state: directory
     recurse: yes
   when: '"slave" in mesos_roles'
+  tags:
+    - mesos
+    - mesos_slave
 
 - name: Ensure that Mesos master state directory exists
   file:
@@ -53,6 +75,9 @@
     state: directory
     recurse: yes
   when: '"master" in mesos_roles'
+  tags:
+    - mesos
+    - mesos_master
 
 - name: Ensure that Mesos slave state directory exists
   file:
@@ -60,6 +85,9 @@
     state: directory
     recurse: yes
   when: '"slave" in mesos_roles'
+  tags:
+    - mesos
+    - mesos_slave
 
 - name: Ensure that prepackaged Mesos state files are removed
   file:
@@ -68,6 +96,8 @@
   with_items:
     - /etc/mesos-master/quorum
     - /etc/mesos-master/work_dir
+  tags:
+    - mesos
 
 - name: Template Mesos ZooKeeper quorum file
   template:
@@ -75,6 +105,7 @@
     dest: /etc/mesos/zk
   tags:
     - config
+    - mesos
 
 - name: Template Mesos base /etc/default file
   template:
@@ -82,6 +113,7 @@
     dest: /etc/default/mesos
   tags:
     - config
+    - mesos
 
 - name: Template Mesos master /etc/default file
   template:
@@ -92,6 +124,8 @@
   when: '"master" in mesos_roles'
   tags:
     - config
+    - mesos
+    - mesos_master
 
 - name: Template Mesos slave /etc/default file
   template:
@@ -102,12 +136,16 @@
   when: '"slave" in mesos_roles'
   tags:
     - config
+    - mesos
+    - mesos_slave
 
 - name: Template Mesos cluster daemon control script
   template:
     src: mesos-control.sh.j2
     dest: "/usr/bin/mesos-{{ safe_mesos_cluster_name }}"
     mode: 0755
+  tags:
+    - mesos
 
 - name: Setup a Monit configuration for the Mesos master
   template:
@@ -118,6 +156,8 @@
   when: '"master" in mesos_roles'
   tags:
     - config
+    - mesos
+    - mesos_master
 
 - name: Setup a Monit configuration for the Mesos slave
   template:
@@ -128,26 +168,37 @@
   when: '"slave" in mesos_roles'
   tags:
     - config
+    - mesos
+    - mesos_slave
 
 - name: Ensure that Monit is loaded with latest configuration
   meta: flush_handlers
   tags:
     - config
+    - mesos
 
 - name: Ensure that the Mesos master is running via Monit
   monit:
     name: "mesos-{{ safe_mesos_cluster_name }}-master"
     state: started
   when: '"master" in mesos_roles'
+  tags:
+    - mesos
+    - mesos_master
 
 - name: Ensure that the Mesos slave is running via Monit
   monit:
     name: "mesos-{{ safe_mesos_cluster_name }}-slave"
     state: started
   when: '"slave" in mesos_roles'
+  tags:
+    - mesos
+    - mesos_slave
 
 - name: Write a Mesos logrotate
   template:
     src: mesos.logrotate.j2
     dest: "/etc/logrotate.d/mesos-{{ safe_mesos_cluster_name }}"
     mode: 0644
+  tags:
+    - mesos

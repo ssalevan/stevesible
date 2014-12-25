@@ -6,6 +6,11 @@ mesos_roles:
   - master
   - slave
 
+mesos_containerizers:
+  - mesos
+
+mesos_executor_timeout: 5mins
+
 mesos_ip: "{{ ansible_default_ipv4.address }}"
 mesos_hostname: "{{ inventory_hostname }}"
 

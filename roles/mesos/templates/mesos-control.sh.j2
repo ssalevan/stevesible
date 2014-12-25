@@ -149,6 +149,7 @@ esac
 # Executes the requested daemon action.
 case "${ACTION}" in
   start)
+    rh_status_q && rh_status && exit 0
     start
     ;;
   stop)
