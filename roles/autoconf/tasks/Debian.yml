@@ -1,5 +1,5 @@
 ---
-- name: Ensure that necessary build tools are installed
+- name: Ensure that autoconf build dependencies are installed
   apt:
     name: "{{ item }}"
     state: latest

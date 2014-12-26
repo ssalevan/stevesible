@@ -5,3 +5,13 @@
     state: latest
   with_items:
     - daemonize
+  when: not build_from_source
+
+- name: Ensure that Daemonize build dependencies are installed
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - gcc
+    - make
+  when: build_from_source

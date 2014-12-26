@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  author: Steve Salevan <steve.salevan@gmail.com>
+  description: Installs and configures Apache Aurora
+  license: Apache 2
+  min_ansible_version: 1.2
+
+dependencies:
+  - role: apt
+  - role: daemonize
+  - role: epel
+  - role: monit

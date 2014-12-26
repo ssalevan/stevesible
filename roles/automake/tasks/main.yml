@@ -1,0 +1,50 @@
+---
+- include: Debian.yml
+  when: ansible_os_family == "Debian"
+  tags:
+    - automake
+
+- include: RedHat.yml
+  when: ansible_os_family == "RedHat"
+  tags:
+    - automake
+
+- name: Download automake release tarball
+  get_url:
+    url: "{{ gnu_mirror_base }}/automake/automake-{{ automake_version }}.tar.gz"
+    dest: "{{ source_dir }}/automake-{{ automake_version }}.tar.gz"
+  register: automake_download
+  tags:
+    - automake
+
+- name: Untar automake tarball
+  command: "tar xvf automake-{{ automake_version }}.tar.gz"
+  args:
+    chdir: "{{ source_dir }}"
+  when: automake_download.changed
+  tags:
+    - automake
+
+- name: Configure automake build
+  command: "./configure --prefix={{ install_dir }}"
+  args:
+    chdir: "{{ source_dir }}/automake-{{ automake_version }}"
+  when: automake_download.changed
+  tags:
+    - automake
+
+- name: Build automake
+  command: make
+  args:
+    chdir: "{{ source_dir }}/automake-{{ automake_version }}"
+  when: automake_download.changed
+  tags:
+    - automake
+
+- name: Install automake
+  command: make install
+  args:
+    chdir: "{{ source_dir }}/automake-{{ automake_version }}"
+  when: automake_download.changed
+  tags:
+    - automake

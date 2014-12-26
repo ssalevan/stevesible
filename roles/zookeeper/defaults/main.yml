@@ -13,7 +13,7 @@ jvm_home: /usr/lib/jvm/java
 
 max_client_conns: 200
 
-mirror_base: http://mirror.cogentco.com/pub/apache/
+apache_mirror_base: http://mirror.cogentco.com/pub/apache/
 
 num_init_ticks: 10
 num_sync_ticks: 5

@@ -1,0 +1,20 @@
+---
+- name: Ensure that Thrift build dependencies are satisfied
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items:
+    - ant
+    - automake
+    - bison
+    - build-essentials
+    - flex
+    - libboost-dev
+    - libboost-test-dev
+    - libboost-program-options-dev
+    - libevent-dev
+    - libtool
+    - pkg-config
+    - g++
+    - libssl-dev

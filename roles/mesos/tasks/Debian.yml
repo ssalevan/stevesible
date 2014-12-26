@@ -1,4 +1,3 @@
-
 ---
 - name: Add Mesosphere repository's Apt key
   apt_key:

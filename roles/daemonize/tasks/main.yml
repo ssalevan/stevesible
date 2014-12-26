@@ -3,7 +3,7 @@
   when: ansible_os_family == "Debian"
 
 - include: RedHat.yml
-  when: ansible_os_family == "RedHat" and not build_from_source
+  when: ansible_os_family == "RedHat"
 
 - include: build.yml
   when: ansible_os_family == "Debian" or build_from_source

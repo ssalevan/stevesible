@@ -1,0 +1,50 @@
+---
+- include: Debian.yml
+  when: ansible_os_family == "Debian"
+  tags:
+    - bison
+
+- include: RedHat.yml
+  when: ansible_os_family == "RedHat"
+  tags:
+    - bison
+
+- name: Download bison release tarball
+  get_url:
+    url: "{{ gnu_mirror_base }}/bison/bison-{{ bison_version }}.tar.gz"
+    dest: "{{ source_dir }}/bison-{{ bison_version }}.tar.gz"
+  register: bison_download
+  tags:
+    - bison
+
+- name: Untar bison tarball
+  command: "tar xvf bison-{{ bison_version }}.tar.gz"
+  args:
+    chdir: "{{ source_dir }}"
+  when: bison_download.changed
+  tags:
+    - bison
+
+- name: Configure bison build
+  command: "./configure --prefix={{ install_dir }}"
+  args:
+    chdir: "{{ source_dir }}/bison-{{ bison_version }}"
+  when: bison_download.changed
+  tags:
+    - bison
+
+- name: Build bison
+  command: make
+  args:
+    chdir: "{{ source_dir }}/bison-{{ bison_version }}"
+  when: bison_download.changed
+  tags:
+    - bison
+
+- name: Install bison
+  command: make install
+  args:
+    chdir: "{{ source_dir }}/bison-{{ bison_version }}"
+  when: bison_download.changed
+  tags:
+    - bison

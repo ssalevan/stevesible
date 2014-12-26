@@ -4,6 +4,7 @@
     name: monit
     state: reloaded
   tags:
+    - monit
     - reload_monit
 
 - name: Restart monit
@@ -12,4 +13,5 @@
     enabled: yes
     state: restarted
   tags:
+    - monit
     - restart_monit

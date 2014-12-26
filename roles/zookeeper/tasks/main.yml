@@ -2,22 +2,32 @@
 - name: Ensure that ZooKeeper site name is templatable
   set_fact:
     safe_zookeeper_site_name: "{{ site_name | regex_replace(' ', '_') }}"
+  tags:
+    - zookeeper
 
-- name: Download ZooKeeper tarball
-  command: "curl -o {{ source_dir }}/zookeeper-{{ zookeeper_version }}.tar.gz {{ mirror_base }}/zookeeper/zookeeper-{{ zookeeper_version }}/zookeeper-{{ zookeeper_version }}.tar.gz"
-  args:
-    creates: "{{ source_dir }}/zookeeper-{{ zookeeper_version }}.tar.gz"
+- name: "Download ZooKeeper {{ zookeeper_version }} release tarball"
+  get_url:
+    url: "{{ apache_mirror_base }}/zookeeper/zookeeper-{{ zookeeper_version }}/zookeeper-{{ zookeeper_version }}.tar.gz"
+    dest: "{{ source_dir }}/zookeeper-{{ zookeeper_version }}.tar.gz"
+  register: zookeeper_download
+  tags:
+    - zookeeper
 
 - name: Untar ZooKeeper tarball
   command: "tar xzf {{ source_dir }}/zookeeper-{{ zookeeper_version }}.tar.gz"
   args:
     chdir: "{{ source_dir }}"
     creates: "{{ source_dir }}/zookeeper-{{ zookeeper_version }}"
+  when: zookeeper_download.changed
+  tags:
+    - zookeeper
 
 - name: Create ZooKeeper user's group
   group:
     name: "{{ zookeeper_group }}"
     system: yes
+  tags:
+    - zookeeper
 
 - name: Create ZooKeeper user
   user:
@@ -26,6 +36,8 @@
     home: "{{ state_dir }}/zookeeper/{{ safe_zookeeper_site_name }}"
     createhome: no
     system: yes
+  tags:
+    - zookeeper
 
 - name: Ensure that the ZooKeeper configuration directory exists
   file:
@@ -33,6 +45,8 @@
     state: directory
     group: "{{ zookeeper_group }}"
     mode: 0755
+  tags:
+    - zookeeper
 
 - name: Ensure that the ZooKeeper /var/run directory exists for PID file creation
   file:
@@ -41,6 +55,8 @@
     recurse: yes
     group: "{{ zookeeper_group }}"
     mode: 0775
+  tags:
+    - zookeeper
 
 - name: Ensure that the site-specific ZooKeeper state directory exists
   file:
@@ -49,6 +65,8 @@
     recurse: yes
     owner: "{{ zookeeper_user }}"
     group: "{{ zookeeper_group }}"
+  tags:
+    - zookeeper
 
 - name: Ensure that the ZooKeeper myid file reflects the correct ID of the server
   template:
@@ -59,7 +77,8 @@
   notify:
     - Restart ZooKeeper via Monit
   tags:
-    - config
+    - zookeeper
+    - zookeeper_config
 
 - name: Ensure that the site-specific ZooKeeper log directory exists
   file:
@@ -67,6 +86,8 @@
     state: directory
     owner: "{{ zookeeper_user }}"
     group: "{{ zookeeper_group }}"
+  tags:
+    - zookeeper
 
 - name: Template a site-specific ZooKeeper server startup script
   template:
@@ -79,7 +100,8 @@
     - Reload Monit
     - Restart ZooKeeper via Monit
   tags:
-    - config
+    - zookeeper
+    - zookeeper_config
 
 - name: Template a site-specific ZooKeeper configuration
   template:
@@ -89,7 +111,8 @@
     - Reload Monit
     - Restart ZooKeeper via Monit
   tags:
-    - config
+    - zookeeper
+    - zookeeper_config
 
 - name: Setup a site-specific ZooKeeper Monit configuration
   template:
@@ -98,7 +121,8 @@
   notify:
     - Reload Monit
   tags:
-    - config
+    - zookeeper
+    - zookeeper_config
 
 - name: Ensure that Monit is loaded with latest configuration
   meta: flush_handlers
@@ -107,6 +131,9 @@
   monit:
     name: "zookeeper-{{ safe_zookeeper_site_name }}"
     state: started
+  tags:
+    - zookeeper
+    - zookeeper_config
 
 - name: Write a site-specific ZooKeeper logrotate
   template:
@@ -115,3 +142,6 @@
     owner: root
     group: root
     mode: 0644
+  tags:
+    - zookeeper
+    - zookeeper_config

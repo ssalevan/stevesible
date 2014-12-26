@@ -1,9 +1,13 @@
 ---
 - include: Debian.yml
   when: ansible_os_family == "Debian"
+  tags:
+    - monit
 
 - include: RedHat.yml
   when: ansible_os_family == "RedHat"
+  tags:
+    - monit
 
 - name: Create Monit state directories
   file:
@@ -12,6 +16,8 @@
     group: root
     mode: 0700
     state: directory
+  tags:
+    - monit
 
 - name: Establish monit.conf
   template:
@@ -22,9 +28,13 @@
     mode: 0600
   notify:
     - Restart monit
+  tags:
+    - monit
 
 - name: Ensure Monit service is running
   service:
     name: monit
     state: started
     enabled: yes
+  tags:
+    - monit
