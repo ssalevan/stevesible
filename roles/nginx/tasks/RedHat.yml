@@ -15,4 +15,4 @@
 - name: Install nginx RPM
   yum: 
     name: nginx
-    state: latest
+    state: present

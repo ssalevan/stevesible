@@ -59,4 +59,4 @@
 - name: Install Bundler gem
   gem:
     name: bundler
-    state: latest
+    state: present

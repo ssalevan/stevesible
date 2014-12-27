@@ -2,6 +2,6 @@
 - name: Ensure that autoconf build dependencies are installed
   apt:
     name: "{{ item }}"
-    state: latest
+    state: present
   with_items:
     - build-essential

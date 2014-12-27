@@ -2,17 +2,17 @@
 - name: Ensure that Thrift build dependencies are satisfied
   yum:
     name: "{{ item }}"
-    state: latest
+    state: present
   with_items:
     - ant
-    - automake
-    - bison
     - boost-devel
     - flex
     - gcc-c++
     - libevent-devel
     - libtool
+    - lua-devel
     - make
     - openssl-devel
     - pkgconfig
+    - python-devel
     - zlib-devel

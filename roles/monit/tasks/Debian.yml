@@ -2,7 +2,7 @@
 - name: Install Monit packages
   apt:
     name: "{{ item }}"
-    state: latest
+    state: present
     update_cache: yes
   with_items:
     - monit

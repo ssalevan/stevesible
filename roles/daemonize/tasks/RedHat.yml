@@ -2,7 +2,7 @@
 - name: Ensure that Daemonize is installed
   yum:
     name: "{{ item }}"
-    state: latest
+    state: present
   with_items:
     - daemonize
   when: not build_from_source
@@ -10,7 +10,7 @@
 - name: Ensure that Daemonize build dependencies are installed
   yum:
     name: "{{ item }}"
-    state: latest
+    state: present
   with_items:
     - gcc
     - make

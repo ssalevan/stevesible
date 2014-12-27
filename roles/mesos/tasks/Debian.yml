@@ -13,7 +13,7 @@
 - name: Install Debian OS packages
   apt:
     pkg: "{{ item }}"
-    state: latest
+    state: present
     update_cache: yes
   with_items:
     - "{{ mesos_pkgname }}"

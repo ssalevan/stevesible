@@ -5,9 +5,9 @@ galaxy_info:
   license: Apache 2
   min_ansible_version: 1.2
 
-#dependencies:
-#  - role: apt
-#  - role: autoconf
-#  - role: automake
-#  - role: bison
-#  - role: epel
+dependencies:
+  - role: apt
+  - role: autoconf
+  - role: automake
+  - role: bison
+  - role: epel

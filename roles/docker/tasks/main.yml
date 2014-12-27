@@ -15,7 +15,7 @@
 - name: Install Docker Python libraries to enable Ansible integration
   pip:
     name: docker-py
-    state: latest
+    state: present
 
 - name: Ensure that the Docker service is running
   service:

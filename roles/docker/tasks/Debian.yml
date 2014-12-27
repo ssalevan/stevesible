@@ -13,7 +13,7 @@
 - name: Make sure that Docker and its dependencies are installed
   apt:
     name: "{{ item }}"
-    state: latest
+    state: present
     update_cache: yes
   with_items:
     - lxc-docker

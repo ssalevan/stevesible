@@ -2,7 +2,7 @@
 - name: Ensure that LSB environment is installed
   apt:
     pkg: "{{ item }}"
-    state: latest
+    state: present
     update_cache: yes
   with_items:
     - lsb
