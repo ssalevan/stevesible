@@ -1,7 +1,9 @@
 ---
-ruby_ver: "2.0.0-p353"
+ruby_version: "2.0.0-p353"
 
-ruby_archive: ftp://ftp.ruby-lang.org/pub/ruby/2.0/ruby-{{ ruby_ver }}.tar.gz
-download_path: /usr/local/src
-install_prefix: /usr
-configure_options: --enable-shared
+ruby_archive: ftp://ftp.ruby-lang.org/pub/ruby/2.0/ruby-{{ ruby_version }}.tar.gz
+
+ruby_source_dir: /usr/src
+ruby_install_dir: /usr
+
+ruby_configure_options: --enable-shared

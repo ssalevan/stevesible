@@ -1,2 +1,31 @@
 ---
-jvm_home: /usr/lib/jvm/java
+aurora_cluster_name: main
+
+aurora_serverset_path: /aurora/scheduler
+
+aurora_native_log_zk_path: /aurora/replicated-log
+
+aurora_native_log_quorum_size: 1
+
+aurora_version: 0.6.0
+
+aurora_jvm_opts: ""
+
+aurora_http_port: 8081
+aurora_libprocess_port: 8083
+
+aurora_extra_flags: []
+
+aurora_zookeeper_quorum: []
+aurora_zookeeper_username: ""
+aurora_zookeeper_password: ""
+
+aurora_log_dir: /var/log
+aurora_log_level: INFO
+
+aurora_source_dir: /usr/src
+aurora_state_dir: /var/lib
+
+aurora_jvm_home: /usr/lib/jvm/java
+
+aurora_apache_mirror_base: http://mirror.cogentco.com/pub/apache/incubator

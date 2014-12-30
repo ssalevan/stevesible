@@ -1,0 +1,48 @@
+---
+- name: Ensure that cluster name is an a templatable state
+  set_fact:
+    safe_aurora_cluster_name: "{{ aurora_cluster_name | regex_replace(' ', '_') }}"
+  tags:
+    - aurora
+
+- name: Download Aurora release tarball
+  get_url:
+    url: "{{ aurora_apache_mirror_base }}/aurora/{{ aurora_version }}/apache-aurora-{{ aurora_version }}-incubating.tar.gz"
+    dest: "{{ aurora_source_dir }}/apache-aurora-{{ aurora_version }}-incubating.tar.gz"
+  register: aurora_download
+  tags:
+    - aurora
+
+- name: Ensure that the Aurora /var/run directory exists
+  file:
+    path: /var/run/aurora
+    state: directory
+    recurse: yes
+    mode: 0775
+  tags:
+    - aurora
+
+- name: Ensure that the Aurora state directory exists
+  file:
+    path: "{{ aurora_state_dir }}/aurora"
+    state: directory
+    recurse: yes
+  tags:
+    - aurora
+
+- name: Ensure that the Aurora log directory exists
+  file:
+    path: "{{ aurora_log_dir }}/aurora"
+    state: directory
+  tags:
+    - aurora
+
+- name: Setup a site-specific Aurora Monit configuration
+  template:
+    src: aurora-scheduler.monit.j2
+    dest: "/etc/monit.d/aurora-scheduler"
+  notify:
+    - Reload Monit
+  tags:
+    - aurora
+    - aurora_config

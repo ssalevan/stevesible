@@ -1,9 +1,13 @@
 ---
 - include: Debian.yml
   when: ansible_os_family == "Debian"
+  tags:
+    - docker
 
 - include: RedHat.yml
   when: ansible_os_family == "RedHat"
+  tags:
+    - docker
 
 - name: Add Docker monit configuration
   template:
@@ -11,19 +15,29 @@
     dest: /etc/monit.d/docker.conf
   notify:
     - Reload Monit
+  tags:
+    - docker
 
 - name: Install Docker Python libraries to enable Ansible integration
   pip:
     name: docker-py
     state: present
+  tags:
+    - docker
 
 - name: Ensure that the Docker service is running
   service:
     name: docker
     state: running
     enabled: yes
-  tags: redock
+  tags:
+    - docker
+    - docker_redock
 
 - name: Complete the docking procedure by logging into the Docker Hub
-  shell: docker login --email="{{ docker_email }}" --username="{{ docker_username }}" --password="{{ docker_password }}"
-  tags: redock
+  command: "docker login --email='{{ docker_email }}' --username='{{ docker_username }}' --password='{{ docker_password }}'"
+  args:
+    creates: "{{ ansible_env['HOME'] }}/.dockercfg"
+  tags:
+    - docker
+    - docker_redock

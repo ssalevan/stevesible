@@ -1,62 +1,57 @@
 ---
-- name: Remove installed Ruby RPMs
-  yum:
-    name: "{{ item }}"
-    state: removed
-  with_items:
+- include: RedHat.yml
+  when: ansible_os_family == "RedHat"
+  tags:
     - ruby
-    - ruby-libs
 
-- name: Install necessary packages for building Ruby
-  yum:
-    name: "{{ item }}"
-    state: installed
-  with_items:
-    - gcc
-    - gcc-c++
-    - make
-    - zlib-devel
-    - openssl-devel
-    - readline-devel
-    - ncurses-devel
-    - gdbm-devel
-    - db4-devel
-    - libffi-devel
-    - tk-devel
-    - libyaml
-    - libyaml-devel
-    - paco
-
-- name: Download the Ruby archive requested via ruby_ver
+- name: Download the Ruby archive requested via ruby_version
   get_url:
     url: "{{ ruby_archive }}"
-    dest: "{{ download_path }}/ruby-{{ ruby_ver }}.tar.gz"
+    dest: "{{ ruby_source_dir }}/ruby-{{ ruby_version }}.tar.gz"
+  register: ruby_download
+  tags:
+    - ruby
 
 - name: Extract the Ruby archive
-  command: "tar xzf ruby-{{ ruby_ver }}.tar.gz"
+  command: "tar xzf ruby-{{ ruby_version }}.tar.gz"
   args:
-    chdir: "{{ download_path }}"
-    creates: "{{ download_path }}/ruby-{{ ruby_ver }}"
+    chdir: "{{ ruby_source_dir }}"
+    creates: "{{ ruby_source_dir }}/ruby-{{ ruby_version }}"
+  when: ruby_download.changed
+  tags:
+    - ruby
 
 - name: Configure the Ruby build environment
-  command: "./configure --prefix={{ install_prefix }} {{ configure_options }}"
+  command: "./configure --prefix='{{ ruby_install_dir }}' {{ ruby_configure_options }}"
   args:
-    chdir: "{{ download_path }}/ruby-{{ ruby_ver }}"
-    creates: "{{ install_prefix }}/bin/ruby"
+    chdir: "{{ ruby_source_dir }}/ruby-{{ ruby_version }}"
+    creates: "{{ ruby_install_dir }}/bin/ruby"
+  when: ruby_download.changed
+  tags:
+    - ruby
 
 - name: Build all Ruby binaries
   command: make
   args:
-    chdir: "{{ download_path }}/ruby-{{ ruby_ver }}"
-    creates: "{{ install_prefix }}/bin/ruby"
+    chdir: "{{ ruby_source_dir }}/ruby-{{ ruby_version }}"
+    creates: "{{ ruby_install_dir }}/bin/ruby"
+  when: ruby_download.changed
+  tags:
+    - ruby
 
 - name: Install Ruby via paco for ease of upgrading
   command: paco -D make install
   args:
-    chdir: "{{ download_path }}/ruby-{{ ruby_ver }}"
-    creates: "{{ install_prefix }}/bin/ruby"
+    chdir: "{{ ruby_source_dir }}/ruby-{{ ruby_version }}"
+    creates: "{{ ruby_install_dir }}/bin/ruby"
+  when: ruby_download.changed
+  tags:
+    - ruby
 
 - name: Install Bundler gem
   gem:
     name: bundler
     state: present
+    executable: "{{ ruby_install_dir }}/bin/gem"
+  tags:
+    - ruby

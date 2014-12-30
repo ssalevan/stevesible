@@ -1,0 +1,97 @@
+---
+- include: RedHat.yml
+  when: ansible_os_family == 'RedHat'
+  tags:
+    - python
+
+- name: Download the Python release tarball
+  get_url:
+    url: "{{ python_mirror_base }}/{{ python_version }}/Python-{{ python_version }}.tgz"
+    dest: "{{ python_source_dir }}/Python-{{ python_version }}.tgz"
+  register: python_download
+  tags:
+    - python
+
+- name: Extract the Python release tarball
+  command: "tar xzf Python-{{ python_version }}.tgz"
+  args:
+    chdir: "{{ python_source_dir }}"
+  when: python_download.changed
+  tags:
+    - python
+
+- name: Configure the Python build environment
+  command: "./configure --prefix='{{ python_install_dir }}' {{ python_configure_options }}"
+  args:
+    chdir: "{{ python_source_dir }}/Python-{{ python_version }}"
+  when: python_download.changed
+  tags:
+    - python
+
+- name: Build all Python binaries
+  command: make
+  args:
+    chdir: "{{ python_source_dir }}/Python-{{ python_version }}"
+  when: python_download.changed
+  tags:
+    - python
+
+- name: Install Python via paco for ease of upgrading
+  command: "paco -lp Python-{{ python_version }} -- make altinstall"
+  args:
+    chdir: "{{ python_source_dir }}/Python-{{ python_version }}"
+  when: python_download.changed
+  tags:
+    - python
+
+- name: Determine the name of the appropriate Python executable
+  shell: "paco -f Python-{{ python_version }} | grep {{ python_install_dir }}/bin/python | head -n1"
+  register: python_executable
+  tags:
+    - python
+
+- name: Download the Python setuptools release tarball
+  get_url:
+    url: "{{ python_pypi_base }}/s/setuptools/setuptools-{{ python_setuptools_version }}.tar.gz"
+    dest: "{{ python_source_dir }}/setuptools-{{ python_setuptools_version }}.tgz"
+  register: setuptools_download
+  tags:
+    - python
+    - python_setuptools
+    - python_pip
+
+- name: Extract the Python setuptools release tarball
+  command: "tar xzf setuptools-{{ python_setuptools_version }}.tgz"
+  args:
+    chdir: "{{ python_source_dir }}"
+  when: setuptools_download.changed
+  tags:
+    - python
+    - python_setuptools
+    - python_pip
+
+- name: Install Python setuptools
+  command: "{{ python_executable.stdout }} setup.py install"
+  args:
+    chdir: "{{ python_source_dir }}/setuptools-{{ python_setuptools_version }}"
+  when: setuptools_download.changed
+  tags:
+    - python
+    - python_setuptools
+    - python_pip
+
+- name: Download the Python pip installation script
+  get_url:
+    url: "{{ python_get_pip_url_base }}/get-pip.py"
+    dest: "{{ python_source_dir }}/get-pip.py"
+  register: pip_download
+  tags:
+    - python
+    - python_pip
+
+- name: Run the Python pip installation script
+  command: "{{ python_executable.stdout }} {{ python_source_dir }}/get-pip.py"
+  when: pip_download.changed
+  tags:
+    - python
+    - python_pip

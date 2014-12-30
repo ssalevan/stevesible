@@ -1,5 +1,5 @@
 ---
-- name: Ensure that Docker and its dependencies are installed
+- name: Ensure that Docker and its dependencies are present
   yum:
     name: "{{ item }}"
     state: present

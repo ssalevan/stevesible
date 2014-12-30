@@ -1,0 +1,12 @@
+---
+python_version: 2.7.8
+python_setuptools_version: 10.0.1
+
+python_install_dir: /usr
+python_source_dir: /usr/src
+
+python_configure_options: ""
+
+python_get_pip_url_base: https://raw.githubusercontent.com/pypa/pip/master/contrib
+python_mirror_base: https://www.python.org/ftp/python/
+python_pypi_base: https://pypi.python.org/packages/source

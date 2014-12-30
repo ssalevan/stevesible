@@ -1,7 +1,7 @@
 ---
 - name: Install necessary packages for Ansible apt integreation
   apt: name="{{ item }}"
-       state=installed
+       state=present
        force=yes
   with_items:
     - apt-transport-https

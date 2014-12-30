@@ -1,36 +1,36 @@
 ---
-client_port: 2181
-follower_port: 2888
-leader_election_port: 3888
+zookeeper_client_port: 2181
+zookeeper_follower_port: 2888
+zookeeper_leader_election_port: 3888
 
-failure_cycles_before_restart: 2
+zookeeper_failure_cycles_before_restart: 2
 
-jmx_local_only: true
-jmx_disable: false
+zookeeper_jmx_local_only: true
+zookeeper_jmx_disable: false
 
-jvm_extra_flags: ""
-jvm_home: /usr/lib/jvm/java
+zookeeper_jvm_extra_flags: ""
+zookeeper_jvm_home: /usr/lib/jvm/java
 
-max_client_conns: 200
+zookeeper_max_client_conns: 200
 
-apache_mirror_base: http://mirror.cogentco.com/pub/apache/
+zookeeper_apache_mirror_base: http://mirror.cogentco.com/pub/apache/
 
-num_init_ticks: 10
-num_sync_ticks: 5
+zookeeper_num_init_ticks: 10
+zookeeper_num_sync_ticks: 5
 
-session_timeout_millis: 180000
-tick_time_millis: 5000
+zookeeper_session_timeout_millis: 180000
+zookeeper_tick_time_millis: 5000
 
-site_name: main
+zookeeper_site_name: main
 
-log_dir: /var/log/zookeeper
-state_dir: /var/lib
-source_dir: /usr/src
+zookeeper_log_dir: /var/log/zookeeper
+zookeeper_state_dir: /var/lib
+zookeeper_source_dir: /usr/src
 
 zookeeper_hosts: []
-host_identifier: ansible_eth0
-identifier_is_ip: true
-host_ip_type: ipv4
+zookeeper_host_identifier: ansible_eth0
+zookeeper_identifier_is_ip: true
+zookeeper_host_ip_type: ipv4
 
 zookeeper_group: zookeeper
 zookeeper_user: zookeeper

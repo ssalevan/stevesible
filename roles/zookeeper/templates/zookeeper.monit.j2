@@ -1,8 +1,8 @@
 # {{ ansible_managed }}
-# Ensures that daemon running ZooKeeper site '{{ site_name }}' is monitored.
+# Ensures that daemon running ZooKeeper site '{{ zookeeper_site_name }}' is monitored.
 
 check process zookeeper-{{ safe_zookeeper_site_name }} with pidfile /var/run/zookeeper/{{ safe_zookeeper_site_name }}.pid
-  if failed port {{ client_port }} type tcp for {{ failure_cycles_before_restart }} cycles then restart
+  if failed port {{ zookeeper_client_port }} type tcp for {{ zookeeper_failure_cycles_before_restart }} cycles then restart
   start program = "/usr/bin/zkServer-{{ safe_zookeeper_site_name }} start /etc/zookeeper/{{ safe_zookeeper_site_name }}.cfg"
     as uid {{ zookeeper_user }} and gid {{ zookeeper_group }}
   stop program = "/usr/bin/zkServer-{{ safe_zookeeper_site_name }} stop /etc/zookeeper/{{ safe_zookeeper_site_name }}.cfg'

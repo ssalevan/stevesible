@@ -11,8 +11,8 @@
 
 - name: Download automake release tarball
   get_url:
-    url: "{{ gnu_mirror_base }}/automake/automake-{{ automake_version }}.tar.gz"
-    dest: "{{ source_dir }}/automake-{{ automake_version }}.tar.gz"
+    url: "{{ automake_gnu_mirror_base }}/automake/automake-{{ automake_version }}.tar.gz"
+    dest: "{{ automake_source_dir }}/automake-{{ automake_version }}.tar.gz"
   register: automake_download
   tags:
     - automake
@@ -20,15 +20,15 @@
 - name: Untar automake tarball
   command: "tar xvf automake-{{ automake_version }}.tar.gz"
   args:
-    chdir: "{{ source_dir }}"
+    chdir: "{{ automake_source_dir }}"
   when: automake_download.changed
   tags:
     - automake
 
 - name: Configure automake build
-  command: "./configure --prefix={{ install_dir }}"
+  command: "./configure --prefix={{ automake_install_dir }}"
   args:
-    chdir: "{{ source_dir }}/automake-{{ automake_version }}"
+    chdir: "{{ automake_source_dir }}/automake-{{ automake_version }}"
   when: automake_download.changed
   tags:
     - automake
@@ -36,15 +36,15 @@
 - name: Build automake
   command: make
   args:
-    chdir: "{{ source_dir }}/automake-{{ automake_version }}"
+    chdir: "{{ automake_source_dir }}/automake-{{ automake_version }}"
   when: automake_download.changed
   tags:
     - automake
 
 - name: Install automake
-  command: make install
+  command: "paco -lp automake-{{ automake_version }} -- make install"
   args:
-    chdir: "{{ source_dir }}/automake-{{ automake_version }}"
+    chdir: "{{ automake_source_dir }}/automake-{{ automake_version }}"
   when: automake_download.changed
   tags:
     - automake

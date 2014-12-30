@@ -1,6 +1,6 @@
 # {{ ansible_managed }}
 
-{{ log_dir }}/{{ site_name | regex_replace(' ', '_') }}/* {
+{{ zookeeper_log_dir }}/{{ zookeeper_site_name | regex_replace(' ', '_') }}/* {
 
   weekly
   rotate 10

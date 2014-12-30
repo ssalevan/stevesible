@@ -3,29 +3,29 @@
 # see http://zookeeper.apache.org/doc/current/zookeeperAdmin.html
 
 # The number of milliseconds of each tick
-tickTime={{ tick_time_millis }}
+tickTime={{ zookeeper_tick_time_millis }}
 
 # The number of ticks that the initial
 # synchronization phase can take
-initLimit={{ num_init_ticks }}
+initLimit={{ zookeeper_num_init_ticks }}
 
 # The number of ticks that can pass between
 # sending a request and getting an acknowledgement
-syncLimit={{ num_sync_ticks }}
+syncLimit={{ zookeeper_num_sync_ticks }}
 
 # the directory where the snapshot is stored.
-dataDir={{ state_dir }}/zookeeper/{{ safe_zookeeper_site_name }}
+dataDir={{ zookeeper_state_dir }}/zookeeper/{{ safe_zookeeper_site_name }}
 
 # the port at which the clients will connect
-clientPort={{ client_port }}
+clientPort={{ zookeeper_client_port }}
 
 # ZooKeeper servers in quorum:
 {% for zookeeper_host in zookeeper_hosts|sort %}
-server.{{ loop.index }}={{ zookeeper_host }}:{{ follower_port }}:{{ leader_election_port }}
+server.{{ loop.index }}={{ zookeeper_host }}:{{ zookeeper_follower_port }}:{{ zookeeper_leader_election_port }}
 {% endfor %}
 
 # Allow larger than default maximum client connections.
-maxClientCnxns={{ max_client_conns }}
+maxClientCnxns={{ zookeeper_max_client_conns }}
 
 # ZooKeeper and HBase need same session timeout values.
-maxSessionTimeout={{ session_timeout_millis }}
+maxSessionTimeout={{ zookeeper_session_timeout_millis }}

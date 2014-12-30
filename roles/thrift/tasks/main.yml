@@ -11,24 +11,24 @@
 
 - name: Download Thrift release tarball
   get_url:
-    url: "{{ apache_mirror_base }}/thrift/{{ thrift_version }}/thrift-{{ thrift_version }}.tar.gz"
-    dest: "{{ source_dir }}/thrift-{{ thrift_version }}.tar.gz"
+    url: "{{ thrift_apache_mirror_base }}/thrift/{{ thrift_version }}/thrift-{{ thrift_version }}.tar.gz"
+    dest: "{{ thrift_source_dir }}/thrift-{{ thrift_version }}.tar.gz"
   register: thrift_download
   tags:
     - thrift
 
 - name: Untar Thrift release tarball
-  command: "tar xzf {{ source_dir }}/thrift-{{ thrift_version }}.tar.gz"
+  command: "tar xzf {{ thrift_source_dir }}/thrift-{{ thrift_version }}.tar.gz"
   args:
-    chdir: "{{ source_dir }}"
+    chdir: "{{ thrift_source_dir }}"
   when: thrift_download.changed
   tags:
     - thrift
 
 - name: Configure Thrift build
-  command: "./configure --prefix='{{ install_dir }}' --with-lua=no"
+  command: "./configure --prefix='{{ thrift_install_dir }}' --with-lua=no"
   args:
-    chdir: "{{ source_dir }}/thrift-{{ thrift_version }}"
+    chdir: "{{ thrift_source_dir }}/thrift-{{ thrift_version }}"
   when: thrift_download.changed
   tags:
     - thrift
@@ -36,7 +36,7 @@
 - name: Build Thrift
   command: make
   args:
-    chdir: "{{ source_dir }}/thrift-{{ thrift_version }}"
+    chdir: "{{ thrift_source_dir }}/thrift-{{ thrift_version }}"
   when: thrift_download.changed
   tags:
     - thrift
@@ -44,7 +44,7 @@
 - name: Install Thrift
   command: make install
   args:
-    chdir: "{{ source_dir }}/thrift-{{ thrift_version }}"
+    chdir: "{{ thrift_source_dir }}/thrift-{{ thrift_version }}"
   when: thrift_download.changed
   tags:
    - thrift

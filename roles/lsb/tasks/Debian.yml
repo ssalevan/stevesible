@@ -1,5 +1,5 @@
 ---
-- name: Ensure that LSB environment is installed
+- name: Ensure that LSB environment is present
   apt:
     pkg: "{{ item }}"
     state: present

@@ -1,23 +1,23 @@
 ---
 - name: Ensure that ZooKeeper site name is templatable
   set_fact:
-    safe_zookeeper_site_name: "{{ site_name | regex_replace(' ', '_') }}"
+    safe_zookeeper_site_name: "{{ zookeeper_site_name | regex_replace(' ', '_') }}"
   tags:
     - zookeeper
 
-- name: "Download ZooKeeper {{ zookeeper_version }} release tarball"
+- name: Download ZooKeeper release tarball
   get_url:
-    url: "{{ apache_mirror_base }}/zookeeper/zookeeper-{{ zookeeper_version }}/zookeeper-{{ zookeeper_version }}.tar.gz"
-    dest: "{{ source_dir }}/zookeeper-{{ zookeeper_version }}.tar.gz"
+    url: "{{ zookeeper_apache_mirror_base }}/zookeeper/zookeeper-{{ zookeeper_version }}/zookeeper-{{ zookeeper_version }}.tar.gz"
+    dest: "{{ zookeeper_source_dir }}/zookeeper-{{ zookeeper_version }}.tar.gz"
   register: zookeeper_download
   tags:
     - zookeeper
 
-- name: Untar ZooKeeper tarball
-  command: "tar xzf {{ source_dir }}/zookeeper-{{ zookeeper_version }}.tar.gz"
+- name: Untar ZooKeeper release tarball
+  command: "tar xzf {{ zookeeper_source_dir }}/zookeeper-{{ zookeeper_version }}.tar.gz"
   args:
-    chdir: "{{ source_dir }}"
-    creates: "{{ source_dir }}/zookeeper-{{ zookeeper_version }}"
+    chdir: "{{ zookeeper_source_dir }}"
+    creates: "{{ zookeeper_source_dir }}/zookeeper-{{ zookeeper_version }}"
   when: zookeeper_download.changed
   tags:
     - zookeeper
@@ -33,7 +33,7 @@
   user:
     name: "{{ zookeeper_user }}"
     group: "{{ zookeeper_group }}"
-    home: "{{ state_dir }}/zookeeper/{{ safe_zookeeper_site_name }}"
+    home: "{{ zookeeper_state_dir }}/zookeeper/{{ safe_zookeeper_site_name }}"
     createhome: no
     system: yes
   tags:
@@ -60,7 +60,7 @@
 
 - name: Ensure that the site-specific ZooKeeper state directory exists
   file:
-    path: "{{ state_dir }}/zookeeper/{{ safe_zookeeper_site_name }}"
+    path: "{{ zookeeper_state_dir }}/zookeeper/{{ safe_zookeeper_site_name }}"
     state: directory
     recurse: yes
     owner: "{{ zookeeper_user }}"
@@ -71,7 +71,7 @@
 - name: Ensure that the ZooKeeper myid file reflects the correct ID of the server
   template:
     src: myid.j2
-    dest: "{{ state_dir }}/zookeeper/{{ safe_zookeeper_site_name }}/myid"
+    dest: "{{ zookeeper_state_dir }}/zookeeper/{{ safe_zookeeper_site_name }}/myid"
     owner: "{{ zookeeper_user }}"
     group: "{{ zookeeper_group }}"
   notify:
@@ -82,7 +82,7 @@
 
 - name: Ensure that the site-specific ZooKeeper log directory exists
   file:
-    path: "{{ log_dir }}/zookeeper/{{ safe_zookeeper_site_name }}"
+    path: "{{ zookeeper_log_dir }}/zookeeper/{{ safe_zookeeper_site_name }}"
     state: directory
     owner: "{{ zookeeper_user }}"
     group: "{{ zookeeper_group }}"

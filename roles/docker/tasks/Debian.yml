@@ -10,7 +10,7 @@
     repo: 'deb https://get.docker.io/ubuntu docker main'
     state: present
 
-- name: Make sure that Docker and its dependencies are installed
+- name: Make sure that Docker and its dependencies are present
   apt:
     name: "{{ item }}"
     state: present

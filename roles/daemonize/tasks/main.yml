@@ -1,9 +1,14 @@
 ---
 - include: Debian.yml
   when: ansible_os_family == "Debian"
+  tags:
+    - daemonize
 
 - include: RedHat.yml
   when: ansible_os_family == "RedHat"
+  tags:
+    - daemonize
 
 - include: build.yml
-  when: ansible_os_family == "Debian" or build_from_source
+  tags:
+    - daemonize

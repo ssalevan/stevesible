@@ -1,10 +1,10 @@
 {%- for zookeeper_host in zookeeper_hosts|sort -%}
-{%- if identifier_is_ip -%}
-{%- if zookeeper_host == hostvars[inventory_hostname][host_identifier][host_ip_type]['address'] -%}
+{%- if zookeeper_identifier_is_ip -%}
+{%- if zookeeper_host == hostvars[inventory_hostname][zookeeper_host_identifier][zookeeper_host_ip_type]['address'] -%}
 {{ loop.index }}
 {%- endif -%}
 {%- else -%}
-{%- if zookeeper_host == hostvars[inventory_hostname][host_identifier] -%}
+{%- if zookeeper_host == hostvars[inventory_hostname][zookeeper_host_identifier] -%}
 {{ loop.index }}
 {%- endif -%}
 {%- endif -%}

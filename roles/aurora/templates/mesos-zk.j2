@@ -1,0 +1,6 @@
+{%- if aurora_zookeeper_username and aurora_zookeeper_password -%}
+{%- set auth_preamble = "%s:%s@" % (aurora_zookeeper_username, aurora_zookeeper_password) -%}
+{%- else -%}
+{%- set auth_preamble = "" -%}
+{%- endif -%}
+zk://{{ auth_preamble }}{% for zookeeper_host in aurora_zookeeper_quorum %}{{ zookeeper_host }}:{{ aurora_zookeeper_port }}{% endfor %}{{ aurora_zookeeper_znode }}

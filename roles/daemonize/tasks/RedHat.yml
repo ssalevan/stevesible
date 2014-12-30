@@ -1,17 +1,9 @@
 ---
-- name: Ensure that Daemonize is installed
-  yum:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    - daemonize
-  when: not build_from_source
-
-- name: Ensure that Daemonize build dependencies are installed
+- name: Ensure that Daemonize build dependencies are present
   yum:
     name: "{{ item }}"
     state: present
   with_items:
     - gcc
     - make
-  when: build_from_source
+    - paco

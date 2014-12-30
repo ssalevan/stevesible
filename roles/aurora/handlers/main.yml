@@ -1,0 +1,7 @@
+---
+- include: ../../monit/handlers/main.yml
+
+- name: Restart Aurora scheduler via Monit
+  monit:
+    name: aurora-scheduler
+    state: restarted

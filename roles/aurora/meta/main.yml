@@ -9,5 +9,6 @@ dependencies:
   - role: apt
   - role: daemonize
   - role: epel
+  - role: java
   - role: monit
   - role: thrift
