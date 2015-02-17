@@ -1,0 +1,14 @@
+---
+- name: Establishes and maintains mesos-master nodes
+  hosts: webheads
+  user: novauser
+  sudo: true
+
+  roles:
+    - role: bootstrap
+    - role: zookeeper
+      zookeeper_hosts: "{{ groups['webheads'] }}"
+    - role: mesos-master
+      zookeeper_quorum: "{{ groups['webheads'] }}"
+    - role: mesos-slave
+      zookeeper_quorum: "{{ groups['webheads'] }}"

@@ -104,16 +104,16 @@
     src: zk.j2
     dest: /etc/mesos/zk
   tags:
-    - config
     - mesos
+    - mesos_config
 
 - name: Template Mesos base /etc/default file
   template:
     src: base-defaults.j2
     dest: /etc/default/mesos
   tags:
-    - config
     - mesos
+    - mesos_config
 
 - name: Template Mesos master /etc/default file
   template:
@@ -123,8 +123,8 @@
     - Restart Mesos master via Monit
   when: '"master" in mesos_roles'
   tags:
-    - config
     - mesos
+    - mesos_config
     - mesos_master
 
 - name: Template Mesos slave /etc/default file
@@ -135,8 +135,8 @@
     - Restart Mesos slave via Monit
   when: '"slave" in mesos_roles'
   tags:
-    - config
     - mesos
+    - mesos_config
     - mesos_slave
 
 - name: Template Mesos cluster daemon control script
@@ -155,8 +155,8 @@
     - Reload Monit
   when: '"master" in mesos_roles'
   tags:
-    - config
     - mesos
+    - mesos_config
     - mesos_master
 
 - name: Setup a Monit configuration for the Mesos slave
@@ -167,15 +167,15 @@
     - Reload Monit
   when: '"slave" in mesos_roles'
   tags:
-    - config
     - mesos
+    - mesos_config
     - mesos_slave
 
 - name: Ensure that Monit is loaded with latest configuration
   meta: flush_handlers
   tags:
-    - config
     - mesos
+    - mesos_config
 
 - name: Ensure that the Mesos master is running via Monit
   monit:

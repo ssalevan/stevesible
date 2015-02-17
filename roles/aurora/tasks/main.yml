@@ -5,14 +5,6 @@
   tags:
     - aurora
 
-- name: Download Aurora release tarball
-  get_url:
-    url: "{{ aurora_apache_mirror_base }}/aurora/{{ aurora_version }}/apache-aurora-{{ aurora_version }}-incubating.tar.gz"
-    dest: "{{ aurora_source_dir }}/apache-aurora-{{ aurora_version }}-incubating.tar.gz"
-  register: aurora_download
-  tags:
-    - aurora
-
 - name: Ensure that the Aurora /var/run directory exists
   file:
     path: /var/run/aurora
@@ -22,18 +14,25 @@
   tags:
     - aurora
 
-- name: Ensure that the Aurora state directory exists
+- name: Ensure that the Aurora log directory exists
   file:
-    path: "{{ aurora_state_dir }}/aurora"
+    path: "{{ aurora_log_dir }}/{{ aurora_cluster_name }}"
     state: directory
-    recurse: yes
   tags:
     - aurora
 
-- name: Ensure that the Aurora log directory exists
-  file:
-    path: "{{ aurora_log_dir }}/aurora"
-    state: directory
+- name: Download Aurora scheduler
+  get_url:
+    url: "{{ aurora_mirror_url }}/{{ aurora_version }}/aurora-scheduler-{{ aurora_version }}.zip"
+    dest: "{{ aurora_lib_dir }}/{{ aurora_version }}/aurora.zip"
+  tags:
+    - aurora
+
+- name: Unzip Aurora archive
+  command: "unzip {{ aurora_lib_dir }}/{{ aurora_version }}/aurora.zip"
+  args:
+    chdir: "{{ aurora_lib_dir }}/{{ aurora_version }}"
+    creates: "{{ aurora_lib_dir }}/{{ aurora_version }}/bin/aurora-scheduler"
   tags:
     - aurora
 
@@ -45,4 +44,3 @@
     - Reload Monit
   tags:
     - aurora
-    - aurora_config

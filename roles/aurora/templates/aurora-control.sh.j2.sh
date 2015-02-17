@@ -15,13 +15,13 @@
 #
 
 # Location where aurora-scheduler.zip was unpacked.
-AURORA_SCHEDULER_HOME=/usr/local/aurora-scheduler
+AURORA_SCHEDULER_HOME='{{ aurora_lib_dir }}/{{ aurora_version }}'
 
 # Flags that control the behavior of the JVM.
 JAVA_OPTS=(
   -server
   # Location of libmesos-XXXX.so / libmesos-XXXX.dylib
-  -Djava.library.path=/usr/local/lib
+  -Djava.library.path='{{ mesos_lib_dir }}'
 
 {% for jvm_flag in aurora_jvm_flags %}
   {{ jvm_flag }}
@@ -38,21 +38,19 @@ AURORA_FLAGS=(
 
   -native_log_quorum_size='{{ aurora_native_log_quorum_size }}'
 
-  -zk_endpoints=localhost:2181
-  -mesos_master_address=$(cat /etc/aurora/mesos-zk)
+  -zk_endpoints="$(cat {{ aurora_conf_dir }}/zk)"
+  -mesos_master_address=''
 
-  -serverset_path='{{ aurora_serverset_path }}'
-
+  -serverset_path='{{ aurora_serverset_zk_path }}'
   -native_log_zk_group_path='{{ aurora_native_log_zk_path }}'
 
   -native_log_file_path="$AURORA_SCHEDULER_HOME/db"
   -backup_dir="$AURORA_SCHEDULER_HOME/backups"
 
-  -thermos_executor_path=/dev/null
-  -gc_executor_path=/dev/null
+  -thermos_executor_path='{{ thermos_bin_dir }}/{{ aurora_version }}/thermos_executor.pex'
+  -gc_executor_path='{{ thermos_bin_dir }}/{{ aurora_version }}/gc_executor.pex'
 
   -vlog='{{ aurora_log_level }}'
-  -logtostderr
 
   # Extra flags:
 {% for extra_flag in aurora_extra_flags %}

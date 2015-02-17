@@ -4,6 +4,18 @@
   user: novauser
   sudo: true
 
+  vars:
+    aurora_version: "0.7.0-RC3"
+    mesos_version: 0.21.1
+
   roles:
-    - role: zookeeper
-      zookeeper_hosts: "{{ groups['webheads'] }}"
+    - role: thermos
+    #- role: thrift
+    #- role: mesos
+    #  mesos_zookeeper_quorum: "{{ groups['webheads'] }}"
+    #- role: zookeeper
+    #  zookeeper_hosts: "{{ groups['webheads'] }}"
+    #- role: docker
+    #  docker_email: steve.salevan@gmail.com
+    #  docker_username: philcollins
+    #  docker_password: ice cream hot dog

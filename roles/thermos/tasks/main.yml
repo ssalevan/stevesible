@@ -1,0 +1,63 @@
+---
+- name: Ensure that the Thermos bin directory exists
+  file:
+    path: "{{ thermos_bin_path }}/{{ aurora_version }}"
+    state: directory
+  tags:
+    - thermos
+
+- name: Download Thermos executor PEX
+  get_url:
+    url: "{{ thermos_mirror_base }}/{{ aurora_version }}/thermos/mesos-{{ mesos_version }}/{{ ansible_os_family }}/{{ ansible_lsb['major_release'] }}/thermos_executor.pex"
+    dest: "{{ thermos_bin_path }}/{{ aurora_version }}/thermos_executor"
+  tags:
+    - thermos
+
+- name: Ensure that Thermos executor is executable
+  file:
+    path: "{{ thermos_bin_path }}/{{ aurora_version }}/thermos_executor"
+    mode: 0755
+  tags:
+    - thermos
+
+- name: Download Thermos observer PEX
+  get_url:
+    url: "{{ thermos_mirror_base }}/{{ aurora_version }}/thermos/mesos-{{ mesos_version }}/{{ ansible_os_family }}/{{ ansible_lsb['major_release'] }}/thermos_observer.pex"
+    dest: "{{ thermos_bin_path }}/{{ aurora_version }}/thermos_observer"
+  tags:
+    - thermos
+
+- name: Ensure that Thermos observer is executable
+  file:
+    path: "{{ thermos_bin_path }}/{{ aurora_version }}/thermos_observer"
+    mode: 0755
+  tags:
+    - thermos
+
+- name: Download Thermos runner PEX
+  get_url:
+    url: "{{ thermos_mirror_base }}/{{ aurora_version }}/thermos/mesos-{{ mesos_version }}/{{ ansible_os_family }}/{{ ansible_lsb['major_release'] }}/thermos_runner.pex"
+    dest: "{{ thermos_bin_path }}/{{ aurora_version }}/thermos_runner"
+  tags:
+    - thermos
+
+- name: Ensure that Thermos runner is executable
+  file:
+    path: "{{ thermos_bin_path }}/{{ aurora_version }}/thermos_runner"
+    mode: 0755
+  tags:
+    - thermos
+
+- name: Download Thermos GC PEX
+  get_url:
+    url: "{{ thermos_mirror_base }}/{{ aurora_version }}/thermos/mesos-{{ mesos_version }}/{{ ansible_os_family }}/{{ ansible_lsb['major_release'] }}/thermos_executor.pex"
+    dest: "{{ thermos_bin_path }}/{{ aurora_version }}/gc_executor"
+  tags:
+    - thermos
+
+- name: Ensure that Thermos GC is executable
+  file:
+    path: "{{ thermos_bin_path }}/{{ aurora_version }}/gc_executor"
+    mode: 0755
+  tags:
+    - thermos

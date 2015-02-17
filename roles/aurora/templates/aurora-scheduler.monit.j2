@@ -1,7 +1,0 @@
-# {{ ansible_managed }}
-# Ensures that daemon running Aurora scheduler daemon for cluster '{{ aurora_cluster_name }}' is monitored.
-
-check process aurora-scheduler with pidfile /var/run/aurora/scheduler.pid
-  if failed port {{ aurora_http_port }} protocol http for {{ aurora_failure_cycles_before_restart }} cycles then restart
-  start program = "/usr/bin/aurora-control start"
-  stop program = "/usr/bin/aurora-control stop"
