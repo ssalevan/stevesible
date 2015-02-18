@@ -47,8 +47,8 @@ AURORA_FLAGS=(
   -native_log_file_path="$AURORA_SCHEDULER_HOME/db"
   -backup_dir="$AURORA_SCHEDULER_HOME/backups"
 
-  -thermos_executor_path='{{ thermos_bin_dir }}/{{ aurora_version }}/thermos_executor.pex'
-  -gc_executor_path='{{ thermos_bin_dir }}/{{ aurora_version }}/gc_executor.pex'
+  -thermos_executor_path='{{ thermos_bin_dir }}/{{ aurora_version }}/thermos_executor'
+  -gc_executor_path='{{ thermos_bin_dir }}/{{ aurora_version }}/gc_executor'
 
   -vlog='{{ aurora_log_level }}'
 
@@ -60,6 +60,5 @@ AURORA_FLAGS=(
 
 # Environment variables control the behavior of the Mesos scheduler driver (libmesos).
 export GLOG_v=0
-export LIBPROCESS_PORT={{ aurora_libprocess_port }}
 
 JAVA_OPTS="${JAVA_OPTS[*]}" exec "$AURORA_SCHEDULER_HOME/bin/aurora-scheduler" "${AURORA_FLAGS[@]}"
