@@ -9,7 +9,7 @@ zookeeper_jmx_local_only: true
 zookeeper_jmx_disable: false
 
 zookeeper_jvm_extra_flags: ""
-zookeeper_jvm_home: /usr/lib/jvm/java
+zookeeper_jvm_home: /usr/lib/jvm/jre
 
 zookeeper_max_client_conns: 200
 

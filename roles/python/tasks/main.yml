@@ -21,7 +21,7 @@
     - python
 
 - name: Configure the Python build environment
-  command: "./configure --prefix='{{ python_install_dir }}' --libdir='{{ python_lib_dir }}' --enable-shared {{ python_configure_options }}"
+  command: "./configure --prefix='{{ python_install_dir }}' --enable-shared {{ python_configure_options }}"
   args:
     chdir: "{{ python_source_dir }}/Python-{{ python_version }}"
   when: python_download.changed

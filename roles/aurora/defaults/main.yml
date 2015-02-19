@@ -36,4 +36,4 @@ aurora_conf_dir: /etc/aurora
 aurora_lib_dir: /usr/lib/aurora
 aurora_log_dir: /var/log/aurora
 
-aurora_jvm_home: /usr/lib/jvm/java
+aurora_jvm_home: /usr/lib/jvm/jre

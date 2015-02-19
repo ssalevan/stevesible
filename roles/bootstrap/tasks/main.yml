@@ -124,6 +124,13 @@
     insertafter: "^# %wheel"
     line: "%{{ base_user }} ALL=(ALL) NOPASSWD: ALL"
 
+- name: Configure sudoers to allow for non-tty sudo
+  lineinfile:
+    dest: /etc/sudoers
+    backup: yes
+    state: absent
+    regexp: "^Defaults\s*requiretty"
+
 - name: Add Postfix monit config
   template:
     src: postfix.monit.j2
