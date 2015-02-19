@@ -82,7 +82,7 @@
 
 - name: Ensure that the site-specific ZooKeeper log directory exists
   file:
-    path: "{{ zookeeper_log_dir }}/zookeeper/{{ safe_zookeeper_site_name }}"
+    path: "{{ zookeeper_log_dir }}/{{ safe_zookeeper_site_name }}"
     state: directory
     owner: "{{ zookeeper_user }}"
     group: "{{ zookeeper_group }}"

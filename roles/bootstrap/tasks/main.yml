@@ -129,7 +129,7 @@
     dest: /etc/sudoers
     backup: yes
     state: absent
-    regexp: "^Defaults\s*requiretty"
+    regexp: "^Defaults.*requiretty"
 
 - name: Add Postfix monit config
   template:
