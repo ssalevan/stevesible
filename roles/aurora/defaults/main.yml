@@ -1,4 +1,10 @@
 ---
+aurora_schedulers: []
+
+aurora_roles:
+  - client
+  - scheduler
+
 aurora_mirror_base: https://s3.amazonaws.com/aurorabuilds
 
 aurora_cluster_name: main
@@ -13,6 +19,7 @@ aurora_version: 0.7.0-RC3
 aurora_jvm_flags: []
 
 aurora_http_port: 8081
+aurora_libprocess_port: 8083
 
 aurora_http_timeout_secs: 2
 aurora_restart_cycles: 10

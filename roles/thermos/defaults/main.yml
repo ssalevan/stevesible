@@ -1,3 +1,6 @@
 ---
-thermos_mirror_base: https://s3.amazonaws.com/aurorabuilds
+thermos_version: "{{ aurora_version|default('0.7.0-RC3') }}"
+
+thermos_mirror_base: "{{ aurora_mirror_base|default('https://s3.amazonaws.com/aurorabuilds') }}"
+
 thermos_bin_path: /usr/bin/thermos

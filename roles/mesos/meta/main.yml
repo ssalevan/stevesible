@@ -3,7 +3,7 @@ galaxy_info:
   author: Steve Salevan <steve.salevan@gmail.com>
   description: Installs and configures Mesos masters and slaves
   license: Apache 2
-  min_ansible_version: 1.2
+  min_ansible_version: 1.4
 
 dependencies:
   - daemonize
