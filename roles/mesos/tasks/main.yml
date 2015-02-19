@@ -179,7 +179,7 @@
 
 - name: Ensure that the Mesos master is running via Monit
   monit:
-    name: "mesos-{{ safe_mesos_cluster_name }}-master"
+    name: "mesos-master-{{ safe_mesos_cluster_name }}"
     state: started
   when: '"master" in mesos_roles'
   tags:
@@ -188,7 +188,7 @@
 
 - name: Ensure that the Mesos slave is running via Monit
   monit:
-    name: "mesos-{{ safe_mesos_cluster_name }}-slave"
+    name: "mesos-slave-{{ safe_mesos_cluster_name }}"
     state: started
   when: '"slave" in mesos_roles'
   tags:

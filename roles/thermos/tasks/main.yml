@@ -1,4 +1,12 @@
 ---
+- name: Ensure that Thermos binary directory exists
+  file:
+    path: "{{ thermos_bin_path }}/{{ thermos_version }}"
+    state: directory
+    recurse: yes
+  tags:
+    - thermos
+
 - name: Download Thermos binaries
   get_url:
     url: "{{ thermos_mirror_base }}/{{ thermos_version }}/thermos/mesos-{{ mesos_version }}/{{ ansible_os_family }}/{{ ansible_lsb['major_release'] }}/{{ item }}.pex"
