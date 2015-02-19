@@ -1,0 +1,20 @@
+---
+- name: Establishes a single-node Aurora cluster
+  hosts: aurora
+  user: ansibler
+  sudo: true
+
+  roles:
+    - bootstrap
+    - role: docker
+      docker_email: YOUR_DOCKER_EMAIL
+      docker_username: YOUR_DOCKER_USERNAME
+      docker_password: YOUR_DOCKER_PASSWORD
+    - role: zookeeper
+      zookeeper_hosts: "{{ groups['aurora'] }}"
+    - role: mesos
+      mesos_zookeeper_quorum: "{{ groups['aurora'] }}"
+      mesos_roles:
+        - master
+        - slave
+    - thermos
