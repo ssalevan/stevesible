@@ -1,9 +1,9 @@
 ---
-authorized_keys: []
+authorized_keys:
+  - "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
 
 base_group: ansibler
 base_user: ansibler
-base_user_password: changeme
 
 logwatch_email: root@localhost
 

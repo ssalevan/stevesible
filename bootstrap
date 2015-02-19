@@ -1,14 +1,15 @@
 #!/bin/bash
 # Runs bootstrapping playbooks against all hosts.
 
-if [ $# -lt 1 ]
+if [ $# -lt 2 ]
 then
   echo
   echo "Runs the bootstrap script against all the nodes in the specified group."
-  echo "Usage: ./bootstrap GROUP"
+  echo "Usage: ./bootstrap ANSIBLE_GROUP"
   exit -1
 fi
 
-export BOOTSTRAP_ROLE="${1}"
+export ANSIBLE_GROUP="${1}"
+export ANSIBLE_HOST_KEY_CHECKING=False
 
-ansible-playbook -s -u ansibler -i ./linode bootstrap.yml
+ansible-playbook -u root -i ./linode bootstrap.yml

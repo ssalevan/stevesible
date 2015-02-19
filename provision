@@ -5,7 +5,7 @@ if [ $# -lt 1 ]
 then
   echo
   echo "Runs the provisioning script for a node in the provided group"
-  echo "Usage: ./provision GROUP"
+  echo "Usage: ./provision ANSIBLE_GROUP"
   exit -1
 fi
 

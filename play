@@ -1,3 +1,4 @@
 #!/bin/bash
+# Executes an Ansible playbook against a bootstrapped node.
 
-ansible-playbook -K -i ./linode "${@}"
+ansible-playbook -u ansibler -i ./linode "${@}"

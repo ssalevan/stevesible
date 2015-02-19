@@ -1,7 +1,6 @@
 ---
-- name: Bootstrap new servers
-  hosts: "{{ lookup('env', 'BOOTSTRAP_ROLE') }}"
-  user: root
+- name: Bootstrap new server node
+  hosts: "{{ lookup('env', 'ANSIBLE_GROUP') }}"
 
   roles:
-    - bootstrap
+    - role: bootstrap

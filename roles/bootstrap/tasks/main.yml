@@ -1,4 +1,10 @@
 ---
+- name: Generate a new base user password
+  local_action: "shell openssl rand -base64 64 | tr -cd '[:alnum:]'"
+  register: base_user_password
+  tags:
+    - bootstrap
+
 - name: Install bootstrap packages
   yum:
     name: "{{ item }}"
@@ -17,8 +23,8 @@
     - screen
     - vim
     - zsh
-
-- include: ../../monit/tasks/main.yml
+  tags:
+    - bootstrap
 
 - name: Establish MOTD
   template:
@@ -27,6 +33,8 @@
     owner: root
     group: root
     mode: 0644
+  tags:
+    - bootstrap
 
 - name: Add sshd monit config
   template:
@@ -62,26 +70,10 @@
   notify:
     - Reload iptables configuration
 
-- name: Add fail2ban monit config
-  template:
-    src: fail2ban.monit.j2
-    dest: /etc/monit.d/fail2ban.conf
-    owner: root
-    group: root
-    mode: 0644
-  notify:
-    - Reload Monit
-
-- name: Start fail2ban service
-  service:
-    name: fail2ban
-    state: started
-    enabled: yes
-
 - name: Create initial user
   user:
     name: "{{ base_user }}"
-    password: "{{ base_user_password }}"
+    password: "{{ base_user_password.stdout }}"
     shell: /bin/zsh
 
 - name: Create initial user's .ssh directory
@@ -113,7 +105,7 @@
 - name: Clone oh-my-zsh repo for initial user
   remote_user: "{{ base_user }}"
   git:
-    repo: git://github.com/robbyrussell/oh-my-zsh.git
+    repo: https://github.com/robbyrussell/oh-my-zsh.git
     dest: "/home/{{ base_user }}/.oh-my-zsh"
 
 - name: Deploy .zshrc
@@ -130,7 +122,7 @@
     state: present
     regexp: "^%{{ base_user }}"
     insertafter: "^# %wheel"
-    line: "%{{ base_user }} ALL=(ALL) ALL"
+    line: "%{{ base_user }} ALL=(ALL) NOPASSWD: ALL"
 
 - name: Add Postfix monit config
   template:

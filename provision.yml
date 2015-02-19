@@ -10,6 +10,10 @@
       local_action: shell od -An -N4 -D < /dev/urandom | xargs
       register: random_number
 
+    - name: Generate a new root password
+      local_action: shell openssl rand -base64 64
+      register: root_password
+
     - name: "Request and kickstart new {{ lookup('env', 'ANSIBLE_GROUP') }} instance"
       local_action:
         module: linode
@@ -17,38 +21,23 @@
         name: "{{ lookup('env', 'ANSIBLE_GROUP') }}_{{ random_number.stdout }}"
         linode_id: "{{ random_number.stdout }}"
         plan: 1
-        datacenter: 4
-        display_group: "{{ lookup('env', 'ANSIBLE_GROUP') }}_{{ random_number.stdout }}"
         distribution: 127
+        datacenter: 4
+        password: "{{ root_password.stdout }}"
+        display_group: "{{ lookup('env', 'ANSIBLE_GROUP') }}_{{ random_number.stdout }}"
         ssh_pub_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
         swap: 512
         wait: yes
         wait_timeout: 600
         state: present
 
-- name: Bootstrap node with initial packages
-  hosts: "{{ lookup('env', 'ANSIBLE_GROUP') }}_{{ random_number.stdout }}"
-  user: root
-  roles:
-    - bootstrap
-  tasks:
-    - name: "Add new node to Ansible group {{ lookup('env', 'ANSIBLE_GROUP') }}"
-      add_host:
-        name: "{{ inventory_hostname }}"
-        groups: "{{ lookup('env', 'ANSIBLE_GROUP') }}"
+    - name: "Run bootstrap for new node {{ lookup('env', 'ANSIBLE_GROUP') }}_{{ random_number.stdout }}"
+      local_action: "shell ./bootstrap {{ lookup('env', 'ANSIBLE_GROUP') }}_{{ random_number.stdout }}"
 
-- name: "Run playbook for Ansible group {{ lookup('env', 'ANSIBLE_GROUP') }}"
-  hosts: localhost
-  tasks:
-    - name: "Run playbook for Ansible group {{ lookup('env', 'ANSIBLE_GROUP') }}"
-      local_action: "shell ./play {{ lookup('env', 'ANSIBLE_GROUP') }}.yml"
-
-- name: "Promote new machine into {{ lookup('env', 'ANSIBLE_GROUP') }} role"
-  hosts: localhost
-  tasks:
     - name: "Change new instance's display group to {{ lookup('env', 'ANSIBLE_GROUP') }}"
       local_action:
         module: linode
         api_key: "{{ linode_api_key.stdout }}"
+        name: "{{ lookup('env', 'ANSIBLE_GROUP') }}_{{ random_number.stdout }}"
         linode_id: '{{ random_number.stdout }}'
         display_group: "{{ lookup('env', 'ANSIBLE_GROUP') }}"
