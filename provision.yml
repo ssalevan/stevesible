@@ -19,7 +19,7 @@
         plan: 1
         datacenter: 4
         display_group: "{{ lookup('env', 'ANSIBLE_GROUP') }}_{{ random_number.stdout }}"
-        distribution: 123
+        distribution: 127
         ssh_pub_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
         swap: 512
         wait: yes

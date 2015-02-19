@@ -9,6 +9,6 @@ then
   exit -1
 fi
 
-BOOTSTRAP_ROLE="${1}"
+export BOOTSTRAP_ROLE="${1}"
 
 ansible-playbook -s -u ansibler -i ./linode bootstrap.yml

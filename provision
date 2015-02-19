@@ -9,6 +9,6 @@ then
   exit -1
 fi
 
-ANSIBLE_GROUP="${1}"
+export ANSIBLE_GROUP="${1}"
 
 ansible-playbook -i ./local provision.yml
