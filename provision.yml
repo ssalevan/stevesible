@@ -1,6 +1,12 @@
 ---
 - name: Request and kickstart new instance from Linode
   hosts: localhost
+  vars:
+    linode_plan_id: 1
+    linode_distribution_id: 127
+    linode_datacenter_id: 4
+    swap_mb: 512
+
   tasks:
     - name: Get Linode API key from ~/.chube
       local_action: shell grep api_key ~/.chube | cut -d':' -f 2 | xargs
@@ -19,25 +25,32 @@
         module: linode
         api_key: "{{ linode_api_key.stdout }}"
         name: "{{ lookup('env', 'ANSIBLE_GROUP') }}_{{ random_number.stdout }}"
-        linode_id: "{{ random_number.stdout }}"
-        plan: 1
-        distribution: 127
-        datacenter: 4
+        plan: "{{ linode_plan_id }}"
+        distribution: "{{ linode_distribution_id }}"
+        datacenter: "{{ linode_datacenter_id }}"
         password: "{{ root_password.stdout }}"
         display_group: "{{ lookup('env', 'ANSIBLE_GROUP') }}_{{ random_number.stdout }}"
         ssh_pub_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
-        swap: 512
+        swap: "{{ swap_mb }}"
         wait: yes
         wait_timeout: 600
         state: present
+      register: new_node
 
-    - name: "Run bootstrap for new node {{ lookup('env', 'ANSIBLE_GROUP') }}_{{ random_number.stdout }}"
+    - name: Run bootstrap script for new node
       local_action: "shell ./bootstrap {{ lookup('env', 'ANSIBLE_GROUP') }}_{{ random_number.stdout }}"
 
     - name: "Change new instance's display group to {{ lookup('env', 'ANSIBLE_GROUP') }}"
       local_action:
         module: linode
         api_key: "{{ linode_api_key.stdout }}"
-        name: "{{ lookup('env', 'ANSIBLE_GROUP') }}_{{ random_number.stdout }}"
-        linode_id: '{{ random_number.stdout }}'
         display_group: "{{ lookup('env', 'ANSIBLE_GROUP') }}"
+        name: "{{ lookup('env', 'ANSIBLE_GROUP') }}_{{ random_number.stdout }}"
+        linode_id: "{{ new_node.instance.id }}"
+        plan: "{{ linode_plan_id }}"
+        distribution: "{{ linode_distribution_id }}"
+        datacenter: "{{ linode_datacenter_id }}"
+        password: "{{ root_password.stdout }}"
+        ssh_pub_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+        swap: "{{ swap_mb }}"
+        state: present

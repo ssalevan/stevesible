@@ -1,8 +1,7 @@
 #!/bin/bash
 # Provisions a new node, provided as the first argument.
 
-if [ $# -lt 1 ]
-then
+if [ $# -lt 1 ]; then
   echo
   echo "Runs the provisioning script for a node in the provided group"
   echo "Usage: ./provision ANSIBLE_GROUP"

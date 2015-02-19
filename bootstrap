@@ -1,8 +1,7 @@
 #!/bin/bash
 # Runs bootstrapping playbooks against all hosts.
 
-if [ $# -lt 2 ]
-then
+if [ $# -lt 1 ]; then
   echo
   echo "Runs the bootstrap script against all the nodes in the specified group."
   echo "Usage: ./bootstrap ANSIBLE_GROUP"

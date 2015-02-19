@@ -1,7 +1,6 @@
 ---
 - name: Establishes a unified environment across all hosts
   hosts: all
-  user: ansibler
   sudo: true
 
   roles:
