@@ -1,8 +1,7 @@
 ---
 - name: Bootstrap new servers
-  hosts: webheads
+  hosts: "{{ lookup('env', 'BOOTSTRAP_ROLE') }}"
   user: root
 
   roles:
     - bootstrap
-    - ruby

@@ -1,0 +1,14 @@
+#!/bin/bash
+# Provisions a new node, provided as the first argument.
+
+if [ $# -lt 1 ]
+then
+  echo
+  echo "Runs the provisioning script for a node in the provided group"
+  echo "Usage: ./provision GROUP"
+  exit -1
+fi
+
+ANSIBLE_GROUP="${1}"
+
+ansible-playbook -i ./local provision.yml

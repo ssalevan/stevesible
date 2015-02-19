@@ -1,7 +1,7 @@
 ---
 - name: Establishes a unified environment across all hosts
   hosts: webheads
-  user: baseuser
+  user: ansibler
   sudo: true
 
   roles:

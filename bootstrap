@@ -1,4 +1,14 @@
 #!/bin/bash
 # Runs bootstrapping playbooks against all hosts.
 
-ansible-playbook -s -u novauser -i ./linode bootstrap.yml "$@"
+if [ $# -lt 1 ]
+then
+  echo
+  echo "Runs the bootstrap script against all the nodes in the specified group."
+  echo "Usage: ./bootstrap GROUP"
+  exit -1
+fi
+
+BOOTSTRAP_ROLE="${1}"
+
+ansible-playbook -s -u ansibler -i ./linode bootstrap.yml

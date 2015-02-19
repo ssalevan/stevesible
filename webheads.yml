@@ -16,6 +16,3 @@
     #- role: zookeeper
     #  zookeeper_hosts: "{{ groups['webheads'] }}"
     #- role: docker
-    #  docker_email: steve.salevan@gmail.com
-    #  docker_username: philcollins
-    #  docker_password: ice cream hot dog
