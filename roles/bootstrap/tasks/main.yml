@@ -26,6 +26,14 @@
   tags:
     - bootstrap
 
+- name: Ensure that all packages are up2date
+  yum:
+    name: "*"
+    state: latest
+  tags:
+    - bootstrap
+    - system_update
+
 - name: Establish MOTD
   template:
     src: motd.j2

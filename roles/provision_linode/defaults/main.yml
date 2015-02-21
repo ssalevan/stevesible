@@ -1,0 +1,10 @@
+---
+linode_display_group: "{{ lookup('env', 'ANSIBLE_GROUP')|default('stevesible') }}"
+linode_ssh_pubkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+linode_swap_mb: 256
+linode_plan_id: 1
+linode_distribution_id: 127
+linode_datacenter_id: 4
+
+linode_provision_wait_secs: 600
