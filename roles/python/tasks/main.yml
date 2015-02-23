@@ -44,6 +44,12 @@
   tags:
     - python
 
+- name: Ensure that x86_64 binaries are properly symlinked
+  command: "ln -s /usr/lib/libpython* /usr/lib64"
+  when: python_download.changed
+  tags:
+    - python
+
 - name: Determine the name of the appropriate Python executable
   shell: "paco -f Python-{{ python_version }} | grep {{ python_install_dir }}/bin/python | head -n1"
   register: python_executable

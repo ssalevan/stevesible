@@ -22,6 +22,7 @@
   pip:
     name: docker-py
     state: present
+    executable: "{{ python_install_dir }}/bin/pip2.7"
   tags:
     - docker
 
@@ -38,6 +39,7 @@
   command: "docker login --email='{{ docker_email }}' --username='{{ docker_username }}' --password='{{ docker_password }}'"
   args:
     creates: "{{ ansible_env['HOME'] }}/.dockercfg"
+  when: docker_authenticate
   tags:
     - docker
     - docker_redock

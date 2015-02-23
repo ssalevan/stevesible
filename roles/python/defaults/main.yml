@@ -3,6 +3,7 @@ python_version: 2.7.8
 python_setuptools_version: 10.0.1
 
 python_install_dir: /usr
+python_exec_prefix: /usr/lib64
 python_lib_dir: /usr/lib64
 python_source_dir: /usr/src
 

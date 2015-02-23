@@ -5,12 +5,7 @@
   sudo: true
 
   roles:
-    - role: bootstrap
-      base_user_password: NEW_ANSIBLER_USER_PASSWORD
     - role: docker
-      docker_email: YOUR_DOCKER_EMAIL
-      docker_username: YOUR_DOCKER_USERNAME
-      docker_password: YOUR_DOCKER_PASSWORD
     - role: zookeeper
       zookeeper_hosts: "{{ groups['aurora'] }}"
     - role: mesos

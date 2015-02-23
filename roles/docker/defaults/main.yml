@@ -1,4 +1,6 @@
 ---
+docker_authenticate: False
+
 docker_email: dev@null.com
 docker_username: username
 docker_password: password

@@ -119,8 +119,6 @@
   template:
     src: master-defaults.j2
     dest: /etc/default/mesos-master
-  notify:
-    - Restart Mesos master via Monit
   when: '"master" in mesos_roles'
   tags:
     - mesos
@@ -131,8 +129,6 @@
   template:
     src: slave-defaults.j2
     dest: /etc/default/mesos-slave
-  notify:
-    - Restart Mesos slave via Monit
   when: '"slave" in mesos_roles'
   tags:
     - mesos

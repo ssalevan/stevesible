@@ -12,3 +12,4 @@ dependencies:
   - role: apt
   - role: epel
   - role: monit
+  - role: python

@@ -74,8 +74,6 @@
     dest: "{{ zookeeper_state_dir }}/zookeeper/{{ safe_zookeeper_site_name }}/myid"
     owner: "{{ zookeeper_user }}"
     group: "{{ zookeeper_group }}"
-  notify:
-    - Restart ZooKeeper via Monit
   tags:
     - zookeeper
     - zookeeper_config
@@ -96,9 +94,6 @@
     owner: root
     group: root
     mode: 0755
-  notify:
-    - Reload Monit
-    - Restart ZooKeeper via Monit
   tags:
     - zookeeper
     - zookeeper_config
@@ -107,12 +102,19 @@
   template:
     src: zoo.cfg.j2
     dest: "/etc/zookeeper/{{ safe_zookeeper_site_name }}.cfg"
-  notify:
-    - Reload Monit
-    - Restart ZooKeeper via Monit
   tags:
     - zookeeper
     - zookeeper_config
+
+- name: Ensure that ZooKeeper service is running
+  shell: "/usr/bin/zkServer-{{ safe_zookeeper_site_name }} start /etc/zookeeper/{{ safe_zookeeper_site_name }}.cfg"
+  args:
+    chdir: "{{ zookeeper_state_dir }}/zookeeper/{{ safe_zookeeper_site_name }}"
+    creates: "/var/run/zookeeper/{{ safe_zookeeper_site_name }}.pid"
+  sudo: yes
+  sudo_user: "{{ zookeeper_user }}"
+  tags:
+    - zookeeper
 
 - name: Setup a site-specific ZooKeeper Monit configuration
   template:
