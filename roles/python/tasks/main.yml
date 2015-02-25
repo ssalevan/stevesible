@@ -45,7 +45,7 @@
     - python
 
 - name: Ensure that x86_64 binaries are properly symlinked
-  command: "ln -s /usr/lib/libpython* /usr/lib64"
+  shell: "ln -s /usr/lib/libpython* /usr/lib64"
   when: python_download.changed
   tags:
     - python

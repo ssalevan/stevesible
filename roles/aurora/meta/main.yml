@@ -9,7 +9,6 @@ dependencies:
   - role: apt
   - role: daemonize
   - role: epel
-  - role: java
   - role: mesos
   - role: monit
   - role: thermos

@@ -21,9 +21,16 @@
   tags:
     - aurora
 
+- name: Ensure that the Aurora lib directory exists
+  file:
+    path: "{{ aurora_lib_dir }}/{{ aurora_version }}"
+    state: directory
+  tags:
+    - aurora
+
 - name: Download Aurora scheduler
   get_url:
-    url: "{{ aurora_mirror_url }}/{{ aurora_version }}/aurora-scheduler-{{ aurora_version }}.zip"
+    url: "{{ aurora_mirror_base }}/{{ aurora_version }}/aurora-scheduler-{{ aurora_version }}.zip"
     dest: "{{ aurora_lib_dir }}/{{ aurora_version }}/aurora.zip"
   tags:
     - aurora
