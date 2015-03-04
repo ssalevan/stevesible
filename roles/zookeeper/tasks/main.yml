@@ -137,10 +137,17 @@
     - zookeeper
     - zookeeper_config
 
-- name: Ensure that the site-specific ZooKeeper is running via Monit
+- name: Wait for Monit to get its act together
+  pause:
+    seconds: 5
+  tags:
+    - zookeeper
+    - zookeeper_config
+
+- name: Ensure that the site-specific ZooKeeper is monitored via Monit
   monit:
     name: "zookeeper-{{ safe_zookeeper_site_name }}"
-    state: started
+    state: monitored
   tags:
     - zookeeper
     - zookeeper_config
