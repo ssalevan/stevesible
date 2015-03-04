@@ -1,7 +1,6 @@
 ---
 - name: Establishes a single-node Aurora cluster
   hosts: aurora
-  user: ansibler
   sudo: true
 
   roles:

@@ -107,7 +107,7 @@
     - zookeeper_config
 
 - name: Ensure that ZooKeeper service is running
-  shell: "/usr/bin/zkServer-{{ safe_zookeeper_site_name }} start /etc/zookeeper/{{ safe_zookeeper_site_name }}.cfg"
+  shell: "/usr/bin/zkServer-{{ safe_zookeeper_site_name }} start /etc/zookeeper/{{ safe_zookeeper_site_name }}.cfg && sleep 30"
   args:
     chdir: "{{ zookeeper_state_dir }}/zookeeper/{{ safe_zookeeper_site_name }}"
     creates: "/var/run/zookeeper/{{ safe_zookeeper_site_name }}.pid"
@@ -115,19 +115,27 @@
   sudo_user: "{{ zookeeper_user }}"
   tags:
     - zookeeper
+    - zookeeper_config
 
 - name: Setup a site-specific ZooKeeper Monit configuration
   template:
     src: zookeeper.monit.j2
     dest: "/etc/monit.d/zookeeper-{{ safe_zookeeper_site_name }}"
+  register: zookeeeper_monit
   notify:
     - Reload Monit
   tags:
     - zookeeper
     - zookeeper_config
 
-- name: Ensure that Monit is loaded with latest configuration
-  meta: flush_handlers
+- name: Ensure that Monit is reloaded
+  service:
+    name: monit
+    state: reloaded
+  when: zookeeeper_monit.changed
+  tags:
+    - zookeeper
+    - zookeeper_config
 
 - name: Ensure that the site-specific ZooKeeper is running via Monit
   monit:

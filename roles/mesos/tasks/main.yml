@@ -168,7 +168,9 @@
     - mesos_slave
 
 - name: Ensure that Monit is loaded with latest configuration
-  meta: flush_handlers
+  service:
+    name: monit
+    state: reloaded
   tags:
     - mesos
     - mesos_config
