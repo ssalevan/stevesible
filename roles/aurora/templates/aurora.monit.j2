@@ -2,6 +2,6 @@
 # Ensures that daemon running Aurora scheduler daemon for cluster '{{ aurora_cluster_name }}' is monitored.
 
 check process aurora-{{ safe_aurora_cluster_name }} with pidfile /var/run/aurora/{{ safe_aurora_cluster_name }}/scheduler.pid
-  if failed port {{ aurora_http_port }} send "GET /health HTTP/1.0\r\n" expect "OK\n" with timeout {{ aurora_http_timeout }} seconds for {{ aurora_restart_cycles }} cycles then restart
-  start program = "/usr/bin/aurora-{{ safe_aurora_cluster_name }}"
-  stop program = "/usr/bin/{{ aurora_version }}/aurora-control {{ safe_aurora_cluster_name }} stop"
+  if failed port {{ aurora_http_port }} send "GET /health HTTP/1.0\r\n" expect "OK\n" with timeout {{ aurora_http_timeout_secs }} seconds for {{ aurora_restart_cycles }} cycles then restart
+  start program = "{{ aurora_bin_dir }}/aurora-{{ safe_aurora_cluster_name }}"
+  stop program = "{{ aurora_bin_dir }}/{{ aurora_version }}/aurora-{{ safe_aurora_cluster_name }} stop"

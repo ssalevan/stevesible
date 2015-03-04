@@ -32,20 +32,28 @@
   get_url:
     url: "{{ aurora_mirror_base }}/{{ aurora_version }}/aurora-scheduler-{{ aurora_version }}.zip"
     dest: "{{ aurora_lib_dir }}/{{ aurora_version }}/aurora.zip"
+  register: aurora_download
   tags:
     - aurora
 
 - name: Unzip Aurora archive
-  command: "unzip {{ aurora_lib_dir }}/{{ aurora_version }}/aurora.zip"
-  args:
-    chdir: "{{ aurora_lib_dir }}/{{ aurora_version }}"
-    creates: "{{ aurora_lib_dir }}/{{ aurora_version }}/bin/aurora-scheduler"
+  unarchive:
+    src: "{{ aurora_lib_dir }}/{{ aurora_version }}/aurora.zip"
+    dest: "{{ aurora_lib_dir }}/{{ aurora_version }}"
+  when: aurora_download.changed
+  tags:
+    - aurora
+
+- name: Template Aurora scheduler daemon control script
+  template:
+    src: aurora-control.sh.j2
+    dest: "{{ aurora_bin_dir }}/aurora-{{ safe_aurora_cluster_name }}"
   tags:
     - aurora
 
 - name: Setup a site-specific Aurora Monit configuration
   template:
-    src: aurora-scheduler.monit.j2
+    src: aurora.monit.j2
     dest: "/etc/monit.d/aurora-scheduler"
   notify:
     - Reload Monit

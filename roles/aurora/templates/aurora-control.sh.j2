@@ -21,7 +21,7 @@ AURORA_SCHEDULER_HOME='{{ aurora_lib_dir }}/{{ aurora_version }}'
 JAVA_OPTS=(
   -server
   # Location of libmesos-XXXX.so / libmesos-XXXX.dylib
-  -Djava.library.path='{{ mesos_lib_dir }}'
+  -Djava.library.path='/usr/lib'
 
 {% for jvm_flag in aurora_jvm_flags %}
   {{ jvm_flag }}
@@ -47,8 +47,8 @@ AURORA_FLAGS=(
   -native_log_file_path="$AURORA_SCHEDULER_HOME/db"
   -backup_dir="$AURORA_SCHEDULER_HOME/backups"
 
-  -thermos_executor_path='{{ thermos_bin_dir }}/{{ aurora_version }}/thermos_executor'
-  -gc_executor_path='{{ thermos_bin_dir }}/{{ aurora_version }}/gc_executor'
+  -thermos_executor_path='{{ thermos_bin_path }}/{{ thermos_version }}/thermos_executor'
+  -gc_executor_path='{{ thermos_bin_path }}/{{ thermos_version }}/gc_executor'
 
   -vlog='{{ aurora_log_level }}'
 

@@ -1,4 +1,8 @@
 ---
+docker_roles:
+  - docker
+  - registry
+
 docker_authenticate: False
 
 docker_email: dev@null.com

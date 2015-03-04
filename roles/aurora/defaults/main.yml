@@ -17,6 +17,7 @@ aurora_native_log_quorum_size: 1
 aurora_version: 0.7.0-RC3
 
 aurora_jvm_flags: []
+aurora_extra_flags: []
 
 aurora_http_port: 8081
 aurora_libprocess_port: 8083
@@ -32,6 +33,7 @@ aurora_zookeeper_password: ""
 
 aurora_log_level: INFO
 
+aurora_bin_dir: /usr/bin
 aurora_conf_dir: /etc/aurora
 aurora_lib_dir: /usr/lib/aurora
 aurora_log_dir: /var/log/aurora
