@@ -1,64 +1,154 @@
 #!/bin/bash
 # {{ ansible_managed }}
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+# Daemonizes and manages an Aurora process for cluster '{{ aurora_cluster_name }}'.
 
-# Location where aurora-scheduler.zip was unpacked.
-AURORA_SCHEDULER_HOME='{{ aurora_lib_dir }}/{{ aurora_version }}'
+function usage {
+  err "Controls the Aurora process for cluster '{{ aurora_cluster_name }}'."
+  err "Usage: ${0} (start|stop|status)"
+}
 
-# Flags that control the behavior of the JVM.
-JAVA_OPTS=(
-  -server
-  # Location of libmesos-XXXX.so / libmesos-XXXX.dylib
-  -Djava.library.path='/usr/lib'
+function msg {
+  out "$*" >&2;
+}
 
-{% for jvm_flag in aurora_jvm_flags %}
-  {{ jvm_flag }}
-{% endfor %}
-)
+function err {
+  local x=${?};
+  msg "$*";
+  return $(( ${x} == 0 ? 1 : ${x} ));
+}
 
-# Flags control the behavior of the Aurora scheduler.
-# For a full list of available flags, run bin/aurora-scheduler -help
-AURORA_FLAGS=(
-  -cluster_name='{{ aurora_cluster_name }}'
+function out {
+  printf '%s\n' "$*";
+}
 
-  # Ports to listen on.
-  -http_port={{ aurora_http_port }}
+# Source function library.
+. /lib/lsb/init-functions
 
-  -native_log_quorum_size='{{ aurora_native_log_quorum_size }}'
+# Get a sane screen width
+[ -z "${COLUMNS:-}" ] && COLUMNS=80
+[ -z "${CONSOLETYPE:-}" ] && CONSOLETYPE="$(/sbin/consoletype)"
 
-  -zk_endpoints="$(cat {{ aurora_conf_dir }}/zk)"
-  -mesos_master_address=''
+# Read in init configuration.
+if [ -z "${BOOTUP:-}" ]; then
+  if [ -f /etc/sysconfig/init ]; then
+    . /etc/sysconfig/init
+  else
+    BOOTUP=color
+    RES_COL=60
+    MOVE_TO_COL="echo -en \\033[${RES_COL}G"
+    SETCOLOR_SUCCESS="echo -en \\033[1;32m"
+    SETCOLOR_FAILURE="echo -en \\033[1;31m"
+    SETCOLOR_WARNING="echo -en \\033[1;33m"
+    SETCOLOR_NORMAL="echo -en \\033[0;39m"
+    LOGLEVEL=1
+  fi
+  if [ "$CONSOLETYPE" = "serial" ]; then
+    BOOTUP=serial
+    MOVE_TO_COL=
+    SETCOLOR_SUCCESS=
+    SETCOLOR_FAILURE=
+    SETCOLOR_WARNING=
+    SETCOLOR_NORMAL=
+  fi
+fi
 
-  -serverset_path='{{ aurora_serverset_zk_path }}'
-  -native_log_zk_group_path='{{ aurora_native_log_zk_path }}'
+function echo_success {
+  [ "$BOOTUP" = "color" ] && $MOVE_TO_COL
+  echo -n "["
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_SUCCESS
+  echo -n $"  OK  "
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+  echo -n "]"
+  echo -ne "\r"
+  return 0
+}
 
-  -native_log_file_path="$AURORA_SCHEDULER_HOME/db"
-  -backup_dir="$AURORA_SCHEDULER_HOME/backups"
+function echo_failure {
+  [ "$BOOTUP" = "color" ] && $MOVE_TO_COL
+  echo -n "["
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_FAILURE
+  echo -n $"FAILED"
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+  echo -n "]"
+  echo -ne "\r"
+  return 1
+}
 
-  -thermos_executor_path='{{ thermos_bin_path }}/{{ thermos_version }}/thermos_executor'
-  -gc_executor_path='{{ thermos_bin_path }}/{{ thermos_version }}/gc_executor'
+# Parse arguments.
+ACTION=${1}
 
-  -vlog='{{ aurora_log_level }}'
+# Ensures that action is.
+if [ -z ${ACTION} ]; then
+  err "ERROR: No action specified."
+  usage
+  exit -1
+fi
 
-  # Extra flags:
-{% for extra_flag in aurora_extra_flags %}
-  {{ extra_flag }}
-{% endfor %}
-)
+STATE_DIR='{{ aurora_state_dir }}/{{ safe_aurora_cluster_name }}'
+LOG_DIR='{{ aurora_log_dir }}/{{ safe_aurora_cluster_name }}'
 
-# Environment variables control the behavior of the Mesos scheduler driver (libmesos).
-export GLOG_v=0
+function start {
+  echo -n $"Starting Aurora for cluster '{{ aurora_cluster_name }}': "
+  start_daemon daemonize -p "${STATE_DIR}/scheduler.pid" -o "${LOG_DIR}/stdout.log" -e "${LOG_DIR}/stderr.log" {{ aurora_bin_dir }}/{{ safe_aurora_cluster_name }}/startup
+  retval=$?
+  [ $retval -eq 0 ] && (echo_success; touch ${STATE_DIR}/scheduler.lock) || echo_failure
+  echo
+  return $retval
+}
 
-JAVA_OPTS="${JAVA_OPTS[*]}" exec "$AURORA_SCHEDULER_HOME/bin/aurora-scheduler" "${AURORA_FLAGS[@]}"
+function stop {
+  echo -n $"Stopping Aurora for cluster '{{ aurora_cluster_name }}': "
+  killproc -p "${STATE_DIR}/scheduler.pid" /usr/local/sbin/aurora
+  retval=$?
+  [ $retval -eq 0 ] && (echo_success; rm -f ${STATE_DIR}/scheduler.lock) || echo_failure
+  echo
+  return $retval
+}
+
+function restart {
+  stop
+  start
+}
+
+function rh_status {
+  pid=$(pidofproc -p ${STATE_DIR}/scheduler.pid /usr/local/sbin/aurora)
+  if [ $? -eq 0 ]; then
+    echo "Aurora (pid ${pid}) is running for cluster '{{ aurora_cluster_name }}'..."
+    return 0
+  else
+    if [ -e ${STATE_DIR}/${ROLE}.lock ]; then
+      echo "Aurora process dead but lockfile exists for cluster '{{ aurora_cluster_name }}'"
+      return 2
+    else
+      echo "Aurora is stopped for cluster '{{ aurora_cluster_name }}'"
+      return 1
+    fi
+  fi
+}
+
+rh_status_q() {
+  rh_status >/dev/null 2>&1
+}
+
+# Executes the requested daemon action.
+case "${ACTION}" in
+  start)
+    rh_status_q && rh_status && exit 0
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  status)
+    rh_status
+    ;;
+  restart)
+    restart
+    ;;
+  *)
+    err "ERROR: Invalid action specified."
+    usage
+    exit -3
+esac
+
+exit $?

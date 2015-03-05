@@ -1,0 +1,1 @@
+{% for zookeeper_host in aurora_zookeeper_quorum|sort %}{{ zookeeper_host }}:{{ aurora_zookeeper_port }},{% endfor %}

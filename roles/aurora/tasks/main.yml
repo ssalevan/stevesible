@@ -14,10 +14,19 @@
   tags:
     - aurora
 
+- name: Ensure that the Aurora bin directory exists
+  file:
+    path: "{{ aurora_bin_dir }}/{{ safe_aurora_cluster_name }}"
+    state: directory
+    recurse: yes
+  tags:
+    - aurora
+
 - name: Ensure that the Aurora log directory exists
   file:
-    path: "{{ aurora_log_dir }}/{{ aurora_cluster_name }}"
+    path: "{{ aurora_log_dir }}/{{ safe_aurora_cluster_name }}"
     state: directory
+    recurse: yes
   tags:
     - aurora
 
@@ -25,6 +34,23 @@
   file:
     path: "{{ aurora_lib_dir }}/{{ aurora_version }}"
     state: directory
+    recurse: yes
+  tags:
+    - aurora
+
+- name: Ensure that the Aurora configuration directory exists
+  file:
+    path: "{{ aurora_conf_dir }}/{{ safe_aurora_cluster_name }}"
+    state: directory
+    recurse: yes
+  tags:
+    - aurora
+
+- name: Ensure that the Aurora state directory exists
+  file:
+    path: "{{ aurora_state_dir }}/{{ safe_aurora_cluster_name }}"
+    state: directory
+    recurse: yes
   tags:
     - aurora
 
@@ -44,12 +70,29 @@
   tags:
     - aurora
 
-- name: Template Aurora scheduler daemon control script
+- name: Template Mesos ZooKeeper quorum file
   template:
-    src: aurora-control.sh.j2
-    dest: "{{ aurora_bin_dir }}/aurora-{{ safe_aurora_cluster_name }}"
+    src: zk.j2
+    dest: "{{ aurora_conf_dir }}/{{ safe_aurora_cluster_name }}/zk"
   tags:
     - aurora
+    - aurora_config
+
+- name: Template Aurora cluster-specific startup script
+  template:
+    src: aurora-startup.sh.j2
+    dest: "{{ aurora_bin_dir }}/{{ safe_aurora_cluster_name }}/startup"
+  tags:
+    - aurora
+    - aurora_config
+
+- name: Template Aurora cluster-specific init script
+  template:
+    src: aurora-control.sh.j2
+    dest: "{{ aurora_bin_dir }}/{{ safe_aurora_cluster_name }}/control"
+  tags:
+    - aurora
+    - aurora_config
 
 - name: Setup a site-specific Aurora Monit configuration
   template:

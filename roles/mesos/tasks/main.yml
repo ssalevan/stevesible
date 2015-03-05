@@ -102,7 +102,7 @@
 - name: Template Mesos ZooKeeper quorum file
   template:
     src: zk.j2
-    dest: /etc/mesos/zk
+    dest: "{{ mesos_conf_dir }}/zk"
   tags:
     - mesos
     - mesos_config

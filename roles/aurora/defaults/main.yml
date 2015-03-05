@@ -1,4 +1,6 @@
 ---
+aurora_version: 0.7.0-RC3
+
 aurora_schedulers: []
 
 aurora_roles:
@@ -13,8 +15,6 @@ aurora_serverset_zk_path: /aurora/scheduler
 aurora_native_log_zk_path: /aurora/replicated-log
 
 aurora_native_log_quorum_size: 1
-
-aurora_version: 0.7.0-RC3
 
 aurora_jvm_flags: []
 aurora_extra_flags: []
@@ -33,9 +33,10 @@ aurora_zookeeper_password: ""
 
 aurora_log_level: INFO
 
-aurora_bin_dir: /usr/bin
+aurora_bin_dir: /usr/bin/aurora
 aurora_conf_dir: /etc/aurora
 aurora_lib_dir: /usr/lib/aurora
 aurora_log_dir: /var/log/aurora
+aurora_state_dir: /var/run/mesos
 
 aurora_jvm_home: /usr/lib/jvm/jre

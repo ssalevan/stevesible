@@ -17,6 +17,7 @@ mesos_hostname: "{{ inventory_hostname }}"
 mesos_master_port: 5050
 mesos_slave_port: 5051
 
+mesos_conf_dir: /etc/mesos
 mesos_log_dir: /var/log/mesos
 mesos_state_dir: /var/run/mesos
 mesos_work_dir: /var/lib/mesos
