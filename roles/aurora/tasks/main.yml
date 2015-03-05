@@ -104,3 +104,11 @@
     - Reload Monit
   tags:
     - aurora
+
+- name: Ensure that the Mesos replicated log has been created
+  command: "mesos-log initialize --path='{{ aurora_lib_dir }}/{{ aurora_version }}/db'"
+  args:
+    creates: "{{ aurora_lib_dir }}/{{ aurora_version }}/db"
+  delegate_to: "{{ aurora_schedulers[0] }}"
+  tags:
+    - aurora

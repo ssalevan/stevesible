@@ -62,5 +62,6 @@ AURORA_FLAGS=(
 # Environment variables control the behavior of the Mesos scheduler driver (libmesos).
 export GLOG_v=1
 export LIBPROCESS_PORT='{{ aurora_libprocess_port }}'
+export JAVA_OPTS="${JAVA_OPTS[*]}"
 
-JAVA_OPTS="${JAVA_OPTS[*]}" exec "${AURORA_SCHEDULER_HOME}/bin/aurora-scheduler" "${AURORA_FLAGS[@]}"
+"${AURORA_SCHEDULER_HOME}/bin/aurora-scheduler" "${AURORA_FLAGS[@]}"

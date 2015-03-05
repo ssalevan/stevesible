@@ -8,13 +8,21 @@
       docker_roles:
         - docker
         - registry
+
     - role: zookeeper
       zookeeper_hosts: "{{ groups['aurora'] }}"
+
     - role: mesos
       mesos_zookeeper_quorum: "{{ groups['aurora'] }}"
+      mesos_containerizers:
+        - docker
+        - mesos
       mesos_roles:
         - master
         - slave
-    - thermos
+
+    - role: thermos
+
     - role: aurora
+      aurora_schedulers: "{{ groups['aurora'] }}"
       aurora_zookeeper_quorum: "{{ groups['aurora'] }}"
