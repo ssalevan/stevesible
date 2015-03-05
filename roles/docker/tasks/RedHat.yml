@@ -5,3 +5,11 @@
     state: present
   with_items:
     - docker-io
+
+- name: Ensure that Docker Registry and its dependencies are present
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - docker-registry
+  when: '"registry" in docker_roles'

@@ -8,3 +8,8 @@ docker_authenticate: False
 docker_email: dev@null.com
 docker_username: username
 docker_password: password
+
+docker_registry_port: 5000
+
+docker_failure_cycles_before_restart: 2
+docker_registry_failure_cycles_before_restart: 2

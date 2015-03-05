@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+# Ensures that daemon running docker-registry is monitored.
+
+check process docker-registry with pidfile /var/run/docker-registry.pid
+  start program = "/etc/init.d/docker-registry start"
+  stop program  = "/etc/init.d/docker-registry stop"
+  if failed port {{ docker_registry_port }} for {{ docker_registry_failure_cycles_before_restart }} cycles then restart
