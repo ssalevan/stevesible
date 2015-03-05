@@ -82,6 +82,7 @@
   template:
     src: aurora-startup.sh.j2
     dest: "{{ aurora_bin_dir }}/{{ safe_aurora_cluster_name }}/startup"
+    mode: 0755
   tags:
     - aurora
     - aurora_config
@@ -90,6 +91,7 @@
   template:
     src: aurora-control.sh.j2
     dest: "{{ aurora_bin_dir }}/{{ safe_aurora_cluster_name }}/control"
+    mode: 0755
   tags:
     - aurora
     - aurora_config

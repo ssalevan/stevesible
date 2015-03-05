@@ -13,4 +13,5 @@
         - master
         - slave
     - thermos
-    - aurora
+    - role: aurora
+      aurora_zookeeper_quorum: "{{ groups['aurora'] }}"

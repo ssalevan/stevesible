@@ -16,7 +16,7 @@
 
 # Location where aurora-scheduler.zip was unpacked.
 AURORA_SCHEDULER_HOME='{{ aurora_lib_dir }}/{{ aurora_version }}'
-AURORA_ZK_ENDPOINTS="$(cat {{ aurora_conf_dir }}/zk)"
+AURORA_ZK_ENDPOINTS="$(cat {{ aurora_conf_dir }}/{{ safe_aurora_cluster_name }}/zk | rev | cut -c 2- | rev)"
 
 # Flags that control the behavior of the JVM.
 JAVA_OPTS=(
@@ -37,8 +37,8 @@ AURORA_FLAGS=(
   # Ports to listen on.
   -http_port={{ aurora_http_port }}
 
-  -zk_endpoints="${AURORA_ZK_ENDPOINTS::-1}"
-  -mesos_master_address="$(cat {{ mesos_conf_dir }}/{{ safe_aurora_cluster_name }}/zk)"
+  -zk_endpoints="${AURORA_ZK_ENDPOINTS}"
+  -mesos_master_address="$(cat {{ mesos_conf_dir }}/zk)"
 
   -serverset_path='{{ aurora_serverset_zk_path }}'
 
