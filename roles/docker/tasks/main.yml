@@ -43,3 +43,24 @@
   tags:
     - docker
     - docker_redock
+
+- name: Add Docker Registry monit configuration
+  template:
+    src: docker-registry.monit.j2
+    dest: /etc/monit.d/docker-registry.conf
+  notify:
+    - Reload Monit
+  when: '"registry" in docker_roles'
+  tags:
+    - docker
+    - docker_registry
+
+- name: Ensure that the Docker registry service is running
+  service:
+    name: docker-registry
+    state: running
+    enabled: yes
+  when: '"registry" in docker_roles'
+  tags:
+    - docker
+    - docker_registry

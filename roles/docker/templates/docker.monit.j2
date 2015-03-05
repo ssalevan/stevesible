@@ -4,4 +4,4 @@
 check process docker with pidfile /var/run/docker.pid
   start program = "/etc/init.d/docker start"
   stop program  = "/etc/init.d/docker stop"
-  if failed unixsocket /var/run/docker.sock for 2 cycles then restart
+  if failed unixsocket /var/run/docker.sock for {{ docker_failure_cycles_before_restart }} cycles then restart

@@ -5,6 +5,9 @@
 
   roles:
     - role: docker
+      docker_roles:
+        - docker
+        - registry
     - role: zookeeper
       zookeeper_hosts: "{{ groups['aurora'] }}"
     - role: mesos
