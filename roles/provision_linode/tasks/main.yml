@@ -39,7 +39,7 @@
 - name: Wait for SSH to come up on new node
   local_action:
     module: wait_for
-    host: "{{ new_node.instance.public.fqdn }}"
+    host: "{{ new_node.instance.public[0].fqdn }}"
     port: 22
   tags:
     - provision_linode
