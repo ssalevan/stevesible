@@ -9,7 +9,7 @@
 
 - name: Download Thermos binaries
   get_url:
-    url: "{{ thermos_mirror_base }}/{{ thermos_version }}/thermos/mesos-{{ mesos_version }}/{{ ansible_os_family }}/{{ ansible_lsb['major_release'] }}/{{ item }}.pex"
+    url: "{{ thermos_mirror_base }}/{{ thermos_version }}/thermos/mesos-{{ mesos_version }}/{{ ansible_os_family }}/{{ ansible_lsb.major_release }}/{{ item }}.pex"
     dest: "{{ thermos_bin_path }}/{{ thermos_version }}/{{ item }}"
   with_items:
     - gc_executor
