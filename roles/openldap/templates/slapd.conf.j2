@@ -12,11 +12,6 @@ argsfile        /var/run/openldap/slapd.args
 
 modulepath      /usr/lib64/openldap
 
-access to *
-  by self write
-  by dn.base="cn={{ openldap_root_user }},{{ openldap_dc }}" write
-  by * read
-
 access to attrs=userPassword
   by self write
   by anonymous auth
@@ -25,6 +20,11 @@ access to attrs=userPassword
 
 access to attrs=shadowLastChange
   by self write
+  by * read
+
+access to *
+  by self write
+  by dn.base="cn={{ openldap_root_user }},{{ openldap_dc }}" write
   by * read
 
 database        {{ openldap_database_type }}
