@@ -116,7 +116,7 @@ function rh_status {
     echo "Aurora (pid ${pid}) is running for cluster '{{ aurora_cluster_name }}'..."
     return 0
   else
-    if [ -e ${STATE_DIR}/${ROLE}.lock ]; then
+    if [ -e ${STATE_DIR}/scheduler.lock ]; then
       echo "Aurora process dead but lockfile exists for cluster '{{ aurora_cluster_name }}'"
       return 2
     else

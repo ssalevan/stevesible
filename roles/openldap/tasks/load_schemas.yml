@@ -1,0 +1,19 @@
+---
+- name: Copy over the LDIF for all requested schema
+  template:
+    src: "schema/{{ item }}.ldif.j2"
+    dest: "{{ openldap_conf_dir }}/{{ openldap_ldif_path }}/{{ item }}.ldif"
+  with_items: openldap_schemas
+  tags:
+    - openldap
+    - openldap_server
+
+- name: Ensure that all requested schema is installed
+  shell: ldapadd -w '{{ openldap_root_password }}' -x -D 'cn={{ openldap_root_user }},{{ openldap_dc }}' -f '{{ openldap_conf_dir }}/{{ openldap_ldif_path }}/{{ item }}.ldif' && touch '{{ openldap_state_dir }}/ldif_done/{{ item }}'
+  args:
+    chdir: "{{ openldap_conf_dir }}/{{ openldap_ldif_path }}"
+    creates: "{{ openldap_state_dir }}/ldif_done/{{ item }}"
+  with_items: openldap_schemas
+  tags:
+    - openldap
+    - openldap_server

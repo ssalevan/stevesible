@@ -1,0 +1,9 @@
+# {{ ansible_managed }}
+
+dn: ou=Users,{{ openldap_dc }}
+objectClass: organizationalUnit
+ou: Users
+
+dn: ou=Groups,{{ openldap_dc }}
+objectClass: organizationalUnit
+ou: Groups

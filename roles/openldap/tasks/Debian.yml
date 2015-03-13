@@ -1,0 +1,11 @@
+---
+- name: Install OpenLDAP dpkgs
+  apt:
+    pkg: "{{ item }}"
+    state: present
+  with_items:
+    - slapd 
+    - ldap-utils
+    - ldapscripts 
+  tags: 
+    - openldap

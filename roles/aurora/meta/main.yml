@@ -9,6 +9,7 @@ dependencies:
   - role: apt
   - role: daemonize
   - role: epel
+  - role: lsb
   - role: mesos
   - role: monit
   - role: thermos

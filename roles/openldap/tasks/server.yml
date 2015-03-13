@@ -1,0 +1,152 @@
+---
+- name: Create OpenLDAP user's group
+  group:
+    name: "{{ openldap_group }}"
+    system: yes
+  tags:
+    - openldap
+    - openldap_server
+
+- name: Create OpenLDAP user
+  user:
+    name: "{{ openldap_user }}"
+    group: "{{ openldap_group }}"
+    home: "{{ openldap_state_dir }}"
+    system: yes
+  tags:
+    - openldap
+    - openldap_server
+
+- name: Ensure that OpenLDAP directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: yes
+    owner: "{{ openldap_user }}"
+    group: "{{ openldap_group }}"
+  with_items:
+    - "{{ openldap_conf_dir }}/{{ openldap_certs_path }}"
+    - "{{ openldap_conf_dir }}/{{ openldap_ldif_path }}"
+    - "{{ openldap_state_dir }}/{{ openldap_domain_name }}"
+  tags:
+    - openldap
+    - openldap_server
+
+- name: Ensure that any prepackaged OpenLDAP LDIFs are removed
+  shell: "rm -rf {{ openldap_conf_dir }}/slapd.d"
+  tags:
+    - openldap
+    - openldap_server
+
+- name: Generate OpenLDAP server key
+  shell: openssl genrsa -des3 -passout pass:password -out my1.key 1024
+  args:
+    chdir: "{{ openldap_conf_dir }}/{{ openldap_certs_path }}"
+    creates: "{{ openldap_conf_dir }}/{{ openldap_certs_path }}/my1.key"
+  tags:
+    - openldap
+    - openldap_server
+
+- name: Strip the passphrase from OpenLDAP server key
+  shell: openssl rsa -in my1.key -passin pass:password -out my.key
+  args:
+    chdir: "{{ openldap_conf_dir }}/{{ openldap_certs_path }}"
+    creates: "{{ openldap_conf_dir }}/{{ openldap_certs_path }}/my.key"
+  tags:
+    - openldap
+    - openldap_server
+
+- name: Create and sign the the OpenLDAP server certificate
+  shell: openssl req -new -x509 -subj '/C={{ openldap_country }}/ST={{ openldap_state }}/L={{ openldap_location }}/O={{ openldap_organization }}/CN={{ inventory_hostname }}/' -days 3650 -key my.key -out cert.crt -extensions v3_ca
+  args:
+    chdir: "{{ openldap_conf_dir }}/{{ openldap_certs_path }}"
+    creates: "{{ openldap_conf_dir }}/{{ openldap_certs_path }}/cert.crt"
+  tags:
+    - openldap
+    - openldap_server
+
+- name: Setup OpenLDAP daemon sysconfig
+  template:
+    src: slapd.sysconfig.j2
+    dest: /etc/sysconfig/ldap
+    mode: 0755
+  when: ansible_os_family == 'RedHat'
+  notify: 
+    - Restart slapd via Monit
+  tags:
+    - openldap
+    - openldap_server
+
+- name: Setup OpenLDAP daemon defaults
+  template:
+    src: slapd.defaults.j2
+    dest: /etc/default/slapd
+    mode: 0755
+  when: ansible_os_family == 'Debian'
+  notify: 
+    - Restart slapd via Monit
+  tags:
+    - openldap
+    - openldap_server
+
+- name: Setup OpenLDAP server (slapd) configuration
+  template:
+    src: slapd.conf.j2
+    dest: "{{ openldap_conf_dir }}/slapd.conf"
+  notify:
+    - Restart slapd via Monit
+  tags:
+    - openldap
+    - openldap_server
+
+- name: Ensure that OpenLDAP service is running
+  service:
+    name: slapd
+    state: running
+  tags:
+    - openldap
+    - openldap_server
+
+- name: Setup an OpenLDAP server monit configuration
+  template:
+    src: slapd.monit.j2
+    dest: /etc/monit.d/slapd
+  register: slapd_monit
+  tags:
+    - openldap
+    - openldap_server
+
+- name: Ensure that Monit is reloaded
+  service:
+    name: monit
+    state: reloaded
+  when: slapd_monit.changed
+  tags:
+    - openldap
+    - openldap_server
+
+- name: Wait for Monit to get its act together
+  pause:
+    seconds: 5
+  tags:
+    - openldap
+    - openldap_server
+
+- name: Ensure that the OpenLDAP server is monitored via Monit
+  monit:
+    name: slapd
+    state: monitored
+  tags:
+    - openldap
+    - openldap_server
+
+- name: Make a directory to remember all OpenLDAP schema changes
+  file:
+    path: "{{ openldap_state_dir }}/ldif_done"
+    state: directory
+    recurse: yes
+  tags:
+    - openldap
+    - openldap_server
+
+- include: load_schemas.yml

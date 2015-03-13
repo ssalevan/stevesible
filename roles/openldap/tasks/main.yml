@@ -1,0 +1,16 @@
+---
+- include: Debian.yml
+  when: ansible_os_family == "Debian"
+  tags:
+    - openldap
+
+- include: RedHat.yml
+  when: ansible_os_family == "RedHat"
+  tags:
+    - openldap
+
+- include: server.yml
+  when: "'server' in openldap_roles"
+
+- include: client.yml
+  when: "'client' in openldap_roles"

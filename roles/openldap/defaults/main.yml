@@ -1,0 +1,41 @@
+---
+openldap_roles:
+  - client
+  - server
+
+openldap_schemas:
+  - db
+  - indexes
+  - users_and_groups
+  - sudo_role
+
+openldap_user: ldap
+openldap_group: ldap
+
+openldap_failure_cycles_before_restart: 2
+openldap_restart_cycles_before_timeout: 5
+
+#The domain prefix for ldap
+openldap_domain_name: example.com
+openldap_dc: "dc={{ openldap_domain_name.split('.')[0] }},dc={{ openldap_domain_name.split('.')[1] }}"
+
+openldap_database_type: hdb
+
+openldap_root_user: Manager
+openldap_root_password: changeme
+
+# Configuration and initial LDIF schema
+openldap_conf_dir: /etc/openldap
+openldap_certs_path: certs
+openldap_ldif_path: ldif
+
+openldap_state_dir: /var/lib/slapd
+
+#The self signed ssl parameters
+openldap_enable_ssl: true
+openldap_country: US
+openldap_state: North Carolina
+openldap_location: Raleigh
+openldap_organization: Phil Collins Incorporated
+
+openldap_done_path: done

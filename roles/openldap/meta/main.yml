@@ -1,0 +1,9 @@
+---
+galaxy_info:
+  author: Steve Salevan <steve.salevan@gmail.com>
+  description: Installs and configures OpenLDAP clients and servers
+  license: Apache 2
+  min_ansible_version: 1.6
+
+dependencies:
+  - role: monit
