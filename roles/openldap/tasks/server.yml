@@ -71,6 +71,7 @@
     dest: /etc/sysconfig/ldap
     mode: 0755
   when: ansible_os_family == 'RedHat'
+  register: openldap_slapd_daemon_defaults
   notify: 
     - Restart slapd via Monit
   tags:
@@ -83,8 +84,17 @@
     dest: /etc/default/slapd
     mode: 0755
   when: ansible_os_family == 'Debian'
+  register: openldap_slapd_daemon_defaults
   notify: 
     - Restart slapd via Monit
+  tags:
+    - openldap
+    - openldap_server
+
+- name: Hash LDAP root user's password
+  shell: "slappasswd -s {{ openldap_root_password }}"
+  register: hashed_openldap_root_password
+  when: openldap_slapd_daemon_defaults.changed
   tags:
     - openldap
     - openldap_server
@@ -99,10 +109,11 @@
     - openldap
     - openldap_server
 
-- name: Ensure that OpenLDAP service is running
+- name: Ensure that OpenLDAP server service is running
   service:
     name: slapd
     state: running
+    enabled: yes
   tags:
     - openldap
     - openldap_server

@@ -1,4 +1,5 @@
 # {{ ansible_managed }}
+# Configures an OpenLDAP server for domain: {{ openldap_domain_name }}
 
 include         /etc/openldap/schema/core.schema
 include         /etc/openldap/schema/cosine.schema
@@ -13,13 +14,13 @@ modulepath      /usr/lib64/openldap
 
 access to *
   by self write
-  by dn.base="cn={{ openldap_root_user }},dc={{ openldap_domain_name.split('.')[0] }},dc={{ openldap_domain_name.split('.')[1] }}" write
+  by dn.base="cn={{ openldap_root_user }},{{ openldap_dc }}" write
   by * read
 
 access to attrs=userPassword
   by self write
   by anonymous auth
-  by dn.base="cn={{ openldap_root_user }},dc={{ openldap_domain_name.split('.')[0] }},dc={{ openldap_domain_name.split('.')[1] }}" write
+  by dn.base="cn={{ openldap_root_user }},{{ openldap_dc }}" write
   by * none
 
 access to attrs=shadowLastChange
@@ -27,8 +28,11 @@ access to attrs=shadowLastChange
   by * read
 
 database        {{ openldap_database_type }}
-suffix          "dc={{ openldap_domain_name.split('.')[0] }},dc={{ openldap_domain_name.split('.')[1] }}"
-rootdn          "cn={{ openldap_root_user }},dc={{ openldap_domain_name.split('.')[0] }},dc={{ openldap_domain_name.split('.')[1] }}"
+{% if openldap_database_type == 'mdb' %}
+maxsize         {{ openldap_database_maxsize_mb * 1024 * 1024 }}
+{% endif %}
+suffix          "{{ openldap_dc }}"
+rootdn          "cn={{ openldap_root_user }},{{ openldap_dc }}"
 rootpw          {{ openldap_root_password }}
 
 #This directory has to be created and would contain the ldap database.
