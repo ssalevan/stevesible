@@ -4,22 +4,22 @@
   sudo: true
 
   roles:
-     - role: docker
-       docker_roles:
-         - docker
-         - registry
+    - role: docker
+      docker_roles:
+        - docker
+        - registry
 
-     - role: zookeeper
-       zookeeper_hosts: "{{ groups['aurora'] }}"
+    - role: zookeeper
+      zookeeper_hosts: "{{ groups['aurora'] }}"
 
-     - role: mesos
-       mesos_zookeeper_quorum: "{{ groups['aurora'] }}"
-       mesos_containerizers:
-         - docker
-         - mesos
-       mesos_roles:
-         - master
-         - slave
+    - role: mesos
+      mesos_zookeeper_quorum: "{{ groups['aurora'] }}"
+      mesos_containerizers:
+        - docker
+        - mesos
+      mesos_roles:
+        - master
+        - slave
 
     - role: thermos
 
