@@ -27,7 +27,7 @@ zookeeper_log_dir: /var/log/zookeeper
 zookeeper_state_dir: /var/lib
 zookeeper_source_dir: /usr/src
 
-zookeeper_hosts: []
+zookeeper_hosts: localhost
 zookeeper_host_identifier: ansible_eth0
 zookeeper_identifier_is_ip: true
 zookeeper_host_ip_type: ipv4

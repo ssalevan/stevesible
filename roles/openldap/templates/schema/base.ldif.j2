@@ -4,7 +4,7 @@ dn: {{ openldap_dc }}
 objectclass: top
 objectclass: domain
 dc: {{ openldap_domain_name.split('.')[0] }}
-description: {{ openldap_org_description }}
+description: {{ openldap_organization_description }}
 
 dn: {{ openldap_dc }}
 objectClass: dcObject

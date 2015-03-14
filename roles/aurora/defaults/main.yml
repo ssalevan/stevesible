@@ -13,7 +13,7 @@ aurora_cluster_name: main
 
 aurora_serverset_zk_path: /scheduler
 
-aurora_state_dir: /var/run/aurora/
+aurora_state_dir: /var/run/aurora
 aurora_native_log_path: db
 aurora_native_log_zk_path: replicated-log
 aurora_backup_path: backups

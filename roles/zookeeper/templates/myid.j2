@@ -1,4 +1,4 @@
-{%- for zookeeper_host in zookeeper_hosts|sort -%}
+{%- for zookeeper_host in zookeeper_hosts.split(',')|sort -%}
 {%- if zookeeper_identifier_is_ip -%}
 {%- if zookeeper_host == hostvars[inventory_hostname][zookeeper_host_identifier][zookeeper_host_ip_type]['address'] -%}
 {{ loop.index }}

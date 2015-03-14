@@ -43,10 +43,10 @@ AURORA_FLAGS=(
   -serverset_path='{{ aurora_serverset_zk_path }}'
 
   -native_log_quorum_size='{{ aurora_native_log_quorum_size }}'
-  -native_log_file_path='{{ aurora_state_dir }}/{{ aurora_native_log_path }}'
+  -native_log_file_path='{{ aurora_state_dir }}/{{ safe_aurora_cluster_name }}/{{ aurora_native_log_path }}'
   -native_log_zk_group_path='{{ aurora_native_log_zk_path }}'
 
-  -backup_dir="{{ aurora_state_dir }}/{{ aurora_backup_path }}"
+  -backup_dir="{{ aurora_state_dir }}/{{ safe_aurora_cluster_name }}/{{ aurora_backup_path }}"
 
   -thermos_executor_path='{{ thermos_bin_path }}/{{ thermos_version }}/thermos_executor'
   -gc_executor_path='{{ thermos_bin_path }}/{{ thermos_version }}/gc_executor'

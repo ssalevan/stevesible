@@ -27,7 +27,7 @@ mesos_ulimit_options: "-n 8192"
 
 mesos_repo_rpm: "http://repos.mesosphere.io/el/6/noarch/RPMS/mesosphere-el-repo-6-2.noarch.rpm"
 
-mesos_zookeeper_quorum: []
+mesos_zookeeper_quorum: localhost
 mesos_zookeeper_port: 2181
 
 mesos_zookeeper_username: ""

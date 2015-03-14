@@ -10,10 +10,10 @@
         - registry
 
     - role: zookeeper
-      zookeeper_hosts: "{{ groups['aurora'] }}"
+      zookeeper_hosts: "{{ groups['aurora']|join(',') }}"
 
     - role: mesos
-      mesos_zookeeper_quorum: "{{ groups['aurora'] }}"
+      mesos_zookeeper_quorum: "{{ groups['aurora']|join(',') }}"
       mesos_containerizers:
         - docker
         - mesos
@@ -24,7 +24,7 @@
     - role: thermos
 
     - role: aurora
-      aurora_schedulers: "{{ groups['aurora'] }}"
-      aurora_zookeeper_quorum: "{{ groups['aurora'] }}"
+      aurora_schedulers: "{{ groups['aurora']|join(',') }}"
+      aurora_zookeeper_quorum: "{{ groups['aurora']|join(',') }}"
 
     - role: openldap

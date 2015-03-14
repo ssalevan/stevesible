@@ -20,7 +20,7 @@ dataDir={{ zookeeper_state_dir }}/zookeeper/{{ safe_zookeeper_site_name }}
 clientPort={{ zookeeper_client_port }}
 
 # ZooKeeper servers in quorum:
-{% for zookeeper_host in zookeeper_hosts|sort %}
+{% for zookeeper_host in zookeeper_hosts.split(',')|sort %}
 server.{{ loop.index }}={{ zookeeper_host }}:{{ zookeeper_follower_port }}:{{ zookeeper_leader_election_port }}
 {% endfor %}
 

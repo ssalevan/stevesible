@@ -3,4 +3,4 @@
 {%- else -%}
 {%- set auth_preamble = "" -%}
 {%- endif -%}
-zk://{{ auth_preamble }}{% for zookeeper_host in mesos_zookeeper_quorum|sort %}{{ zookeeper_host }}:{{ mesos_zookeeper_port }}{% endfor %}{{ mesos_zookeeper_znode }}
+zk://{{ auth_preamble }}{% for zookeeper_host in mesos_zookeeper_quorum.split(',')|sort %}{{ zookeeper_host }}:{{ mesos_zookeeper_port }}{% endfor %}{{ mesos_zookeeper_znode }}
