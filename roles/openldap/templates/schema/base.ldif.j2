@@ -1,8 +1,8 @@
 # {{ ansible_managed }}
 
 dn: {{ openldap_dc }}
-objectclass: top
-objectclass: domain
+objectClass: top
+objectClass: domain
 dc: {{ openldap_domain_name.split('.')[0] }}
 description: {{ openldap_organization_description }}
 

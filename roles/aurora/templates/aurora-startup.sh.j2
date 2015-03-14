@@ -64,4 +64,4 @@ export GLOG_v=1
 export LIBPROCESS_PORT='{{ aurora_libprocess_port }}'
 export JAVA_OPTS="${JAVA_OPTS[*]}"
 
-"${AURORA_SCHEDULER_HOME}/bin/aurora-scheduler" "${AURORA_FLAGS[@]}"
+exec "${AURORA_SCHEDULER_HOME}/bin/aurora-scheduler" "${AURORA_FLAGS[@]}"
