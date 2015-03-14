@@ -42,11 +42,11 @@
   shell: "unzip {{ aurora_lib_dir }}/{{ aurora_version }}/aurora.zip"
   args:
     chdir: "{{ aurora_lib_dir }}/{{ aurora_version }}"
-    creates: "{{ aurora_lib_dir }}/{{ aurora_version }}/bin/aurora-scheduler"
+    creates: "{{ aurora_lib_dir }}/{{ aurora_version }}/aurora-scheduler-{{ aurora_version }}/bin/aurora-scheduler"
   tags:
     - aurora
 
-- name: Template Mesos ZooKeeper quorum file
+- name: Template Aurora ZooKeeper quorum file
   template:
     src: zk.j2
     dest: "{{ aurora_conf_dir }}/{{ safe_aurora_cluster_name }}/zk"
@@ -76,10 +76,12 @@
   template:
     src: aurora.monit.j2
     dest: "/etc/monit.d/aurora-scheduler"
+  register: aurora_monit
   notify:
     - Reload Monit
   tags:
     - aurora
+    - aurora_config
 
 - name: Ensure that the Aurora replicated log has been initialized
   command: "mesos-log initialize --path='{{ aurora_state_dir }}/{{ safe_aurora_cluster_name }}/{{ aurora_native_log_path }}'"
@@ -88,3 +90,35 @@
   delegate_to: "{{ aurora_replicated_log_node }}"
   tags:
     - aurora
+
+- name: Ensure that the Aurora service is running
+  shell: "/usr/bin/aurora/{{ safe_aurora_cluster_name }}/control start"
+  args:
+    creates: "{{ aurora_state_dir }}/{{ safe_aurora_cluster_name }}/scheduler.pid"
+  tags:
+    - aurora
+
+- name: Ensure that Monit is loaded with latest configuration
+  service:
+    name: monit
+    state: reloaded
+  when: aurora_monit.changed
+  tags:
+    - aurora
+    - aurora_config
+
+- name: Wait for Monit to get its act together
+  pause:
+    seconds: 5
+  when: aurora_monit.changed
+  tags:
+    - aurora
+    - aurora_config
+
+- name: Ensure that Aurora is monitored by Monit
+  monit:
+    name: "aurora-{{ safe_aurora_cluster_name }}"
+    state: monitored
+  tags:
+    - aurora
+    - aurora_config

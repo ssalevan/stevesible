@@ -168,6 +168,7 @@
   notify:
     - Reload Monit
   when: '"master" in mesos_roles'
+  register: mesos_master_monit
   tags:
     - mesos
     - mesos_config
@@ -180,6 +181,7 @@
   notify:
     - Reload Monit
   when: '"slave" in mesos_roles'
+  register: mesos_slave_monit
   tags:
     - mesos
     - mesos_config
@@ -189,6 +191,7 @@
   service:
     name: monit
     state: reloaded
+  when: mesos_master_monit.changed or mesos_slave_monit.changed
   tags:
     - mesos
     - mesos_config
@@ -196,6 +199,7 @@
 - name: Wait for Monit to get its act together
   pause:
     seconds: 5
+  when: mesos_master_monit.changed or mesos_slave_monit.changed
   tags:
     - mesos
     - mesos_config

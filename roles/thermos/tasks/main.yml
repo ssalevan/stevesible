@@ -1,4 +1,9 @@
 ---
+- name: Workaround ansible_lsb bug by re-running setup module
+  setup:
+  tags:
+    - thermos
+
 - name: Ensure that Thermos binary directory exists
   file:
     path: "{{ thermos_bin_path }}/{{ thermos_version }}"
