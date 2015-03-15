@@ -1,10 +1,10 @@
 #!/bin/bash
 # {{ ansible_managed }}
-# Controls a Mesos process for cluster '{{ mesos_cluster_name }}'.
+# Daemonizes and manages a Thermos observer process.
 
 function usage {
-  err "Controls a Mesos process for cluster '{{ mesos_cluster_name }}'."
-  err "Usage: ${0} (master|slave) (start|stop|status)"
+  err "Controls the Thermos observer process."
+  err "Usage: ${0} (start|stop|status)"
 }
 
 function msg {
@@ -75,38 +75,32 @@ function echo_failure {
 }
 
 # Parse arguments.
-ROLE=${1}
-ACTION=${2}
+ACTION=${1}
 
-# Ensures that action and role are specified.
-if [ -z ${ACTION} -o -z ${ROLE} ]; then
-  if [ -z ${ACTION} ]; then
-    err "ERROR: No action specified."
-  fi
-  if [ -z ${ROLE} ]; then
-    err "ERROR: No role specified."
-  fi
+# Ensures that action is.
+if [ -z ${ACTION} ]; then
+  err "ERROR: No action specified."
   usage
   exit -1
 fi
 
-STATE_DIR='{{ mesos_state_dir }}/{{ safe_mesos_cluster_name }}'
-LOG_DIR='{{ mesos_log_dir }}/{{ safe_mesos_cluster_name }}'
+STATE_DIR='{{ thermos_state_dir }}'
+LOG_DIR='{{ thermos_log_dir }}'
 
 function start {
-  echo -n $"Starting Mesos ${ROLE} for cluster '{{ mesos_cluster_name }}': "
-  start_daemon daemonize -p "${STATE_DIR}/${ROLE}.pid" -o "${LOG_DIR}/${ROLE}/stdout.log" -e "${LOG_DIR}/${ROLE}/stderr.log" /usr/bin/mesos-${ROLE}-{{ safe_mesos_cluster_name }}_startup
+  echo -n $"Starting Thermos observer: "
+  start_daemon daemonize -p "${STATE_DIR}/observer.pid" -e "${LOG_DIR}/stderr.log" {{ thermos_bin_dir }}/{{ thermos_version }}/observer_startup
   retval=$?
-  [ $retval -eq 0 ] && (echo_success; touch ${STATE_DIR}/${ROLE}.lock) || echo_failure
+  [ $retval -eq 0 ] && (echo_success; touch ${STATE_DIR}/observer.lock) || echo_failure
   echo
   return $retval
 }
 
 function stop {
-  echo -n $"Stopping Mesos ${ROLE} for cluster '{{ mesos_cluster_name }}': "
-  killproc -p "${STATE_DIR}/${ROLE}.pid" /usr/local/sbin/mesos-${ROLE}
+  echo -n $"Stopping Thermos observer: "
+  killproc -p "${STATE_DIR}/observer.pid" /usr/local/sbin/thermos_observer.pex
   retval=$?
-  [ $retval -eq 0 ] && (echo_success; rm -f ${STATE_DIR}/${ROLE}.lock) || echo_failure
+  [ $retval -eq 0 ] && (echo_success; rm -f ${STATE_DIR}/observer.lock) || echo_failure
   echo
   return $retval
 }
@@ -117,16 +111,16 @@ function restart {
 }
 
 function rh_status {
-  pid=$(pidofproc -p ${STATE_DIR}/${ROLE}.pid /usr/local/sbin/mesos-${ROLE})
+  pid=$(pidofproc -p ${STATE_DIR}/observer.pid /usr/local/sbin/thermos_observer.pex)
   if [ $? -eq 0 ]; then
-    echo "mesos-${ROLE} (pid ${pid}) is running for cluster '{{ mesos_cluster_name }}'..."
+    echo "Thermos observer (pid ${pid}) is running on port {{ thermos_observer_port }}..."
     return 0
   else
-    if [ -e ${STATE_DIR}/${ROLE}.lock ]; then
-      echo "mesos-${ROLE} process dead but lockfile exists for cluster '{{ mesos_cluster_name }}'"
+    if [ -e ${STATE_DIR}/observer.lock ]; then
+      echo "Thermos observer process dead but lockfile exists"
       return 2
     else
-      echo "mesos-${ROLE} is stopped for cluster '{{ mesos_cluster_name }}'"
+      echo "Thermos observer is stopped"
       return 1
     fi
   fi
@@ -135,16 +129,6 @@ function rh_status {
 rh_status_q() {
   rh_status >/dev/null 2>&1
 }
-
-# Ensures that Mesos role is sane.
-case "${ROLE}" in
-  master|slave)
-    ;;
-  *)
-    err "ERROR: Invalid Mesos role specified."
-    usage
-    exit -2
-esac
 
 # Executes the requested daemon action.
 case "${ACTION}" in

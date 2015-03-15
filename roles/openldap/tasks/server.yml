@@ -138,7 +138,7 @@
 
 - name: Wait for Monit to get its act together
   pause:
-    seconds: 5
+    seconds: 10
   when: slapd_monit.changed
   tags:
     - openldap

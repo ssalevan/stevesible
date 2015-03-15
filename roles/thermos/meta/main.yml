@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Steve Salevan <steve.salevan@gmail.com>
-  description: Installs and configures the Thermos executor used by the Aurora Mesos scheduler
+  description: Installs and configures the Thermos executor and observer used by the Aurora Mesos scheduler
   license: Apache 2
   min_ansible_version: 1.4
   categories:
@@ -10,4 +10,5 @@ galaxy_info:
 
 dependencies:
   - role: mesos
+  - role: monit
   - role: python

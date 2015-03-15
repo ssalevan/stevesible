@@ -11,17 +11,19 @@ aurora_mirror_base: https://s3.amazonaws.com/aurorabuilds
 
 aurora_cluster_name: main
 
-aurora_serverset_zk_path: /scheduler
+aurora_serverset_zk_path: /aurora/scheduler
+aurora_native_log_zk_path: /aurora/replicated-log
 
 aurora_state_dir: /var/run/aurora
 aurora_native_log_path: db
-aurora_native_log_zk_path: replicated-log
 aurora_backup_path: backups
 
 aurora_native_log_quorum_size: 1
 
 aurora_jvm_flags: []
 aurora_extra_flags: []
+
+aurora_enable_beta_updater: true
 
 aurora_http_port: 8081
 aurora_libprocess_port: 8083
@@ -30,7 +32,7 @@ aurora_http_timeout_secs: 2
 aurora_restart_cycles: 10
 
 aurora_zookeeper_quorum: []
-aurora_zookeeper_port: 2021
+aurora_zookeeper_port: 2181
 
 aurora_zookeeper_username: ""
 aurora_zookeeper_password: ""

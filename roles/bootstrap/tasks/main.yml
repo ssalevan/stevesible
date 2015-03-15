@@ -17,6 +17,8 @@
     - iftop
     - java-1.7.0-openjdk
     - logwatch
+    - mtr
+    - nc
     - postfix
     - python-keyczar
     - python-pip

@@ -6,6 +6,7 @@
   with_items: openldap_schemas
   tags:
     - openldap
+    - openldap_schema
     - openldap_server
 
 - name: Ensure that all requested schema is installed
@@ -16,4 +17,5 @@
   with_items: openldap_schemas
   tags:
     - openldap
+    - openldap_schema
     - openldap_server

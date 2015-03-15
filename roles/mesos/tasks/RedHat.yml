@@ -10,3 +10,20 @@
     state: present
   with_items:
     - "{{ mesos_pkgname }}"
+
+- name: Ensure that Mesos cgroup mount locations exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: yes
+  with_items:
+    - '/cgroup/cpu'
+    - '/cgroup/mem'
+
+- name: Ensure that CPU cgroup hierarchy is mounted
+  mount:
+    name: /cgroup/cpu
+    fstype: cgroup
+    src: cpu
+    opts: cpu
+    state: mounted

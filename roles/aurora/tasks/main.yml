@@ -42,7 +42,7 @@
   shell: "unzip {{ aurora_lib_dir }}/{{ aurora_version }}/aurora.zip"
   args:
     chdir: "{{ aurora_lib_dir }}/{{ aurora_version }}"
-    creates: "{{ aurora_lib_dir }}/{{ aurora_version }}/aurora-scheduler-{{ aurora_version }}/bin/aurora-scheduler"
+    creates: "{{ aurora_lib_dir }}/{{ aurora_version }}/aurora-scheduler-{{ aurora_version }}"
   tags:
     - aurora
 
@@ -72,22 +72,20 @@
     - aurora
     - aurora_config
 
-- name: Setup a site-specific Aurora Monit configuration
-  template:
-    src: aurora.monit.j2
-    dest: "/etc/monit.d/aurora-scheduler"
-  register: aurora_monit
-  notify:
-    - Reload Monit
-  tags:
-    - aurora
-    - aurora_config
-
 - name: Ensure that the Aurora replicated log has been initialized
   command: "mesos-log initialize --path='{{ aurora_state_dir }}/{{ safe_aurora_cluster_name }}/{{ aurora_native_log_path }}'"
   args:
     creates: "{{ aurora_state_dir }}/{{ safe_aurora_cluster_name }}/{{ aurora_native_log_path }}"
   delegate_to: "{{ aurora_replicated_log_node }}"
+  when: aurora_schedulers != '127.0.0.1'
+  tags:
+    - aurora
+
+- name: Ensure that the Aurora replicated log has been initialized
+  command: "mesos-log initialize --path='{{ aurora_state_dir }}/{{ safe_aurora_cluster_name }}/{{ aurora_native_log_path }}'"
+  args:
+    creates: "{{ aurora_state_dir }}/{{ safe_aurora_cluster_name }}/{{ aurora_native_log_path }}"
+  when: aurora_schedulers == '127.0.0.1'
   tags:
     - aurora
 
@@ -97,6 +95,15 @@
     creates: "{{ aurora_state_dir }}/{{ safe_aurora_cluster_name }}/scheduler.pid"
   tags:
     - aurora
+
+- name: Setup a site-specific Aurora Monit configuration
+  template:
+    src: aurora.monit.j2
+    dest: "/etc/monit.d/aurora-scheduler"
+  register: aurora_monit
+  tags:
+    - aurora
+    - aurora_config
 
 - name: Ensure that Monit is loaded with latest configuration
   service:
@@ -109,7 +116,7 @@
 
 - name: Wait for Monit to get its act together
   pause:
-    seconds: 5
+    seconds: 10
   when: aurora_monit.changed
   tags:
     - aurora

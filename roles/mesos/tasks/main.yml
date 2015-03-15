@@ -89,16 +89,6 @@
     - mesos
     - mesos_slave
 
-- name: Ensure that prepackaged Mesos state files are removed
-  file:
-    path: "{{ item }}"
-    state: absent
-  with_items:
-    - /etc/mesos-master/quorum
-    - /etc/mesos-master/work_dir
-  tags:
-    - mesos
-
 - name: Template Mesos ZooKeeper quorum file
   template:
     src: zk.j2
@@ -107,28 +97,22 @@
     - mesos
     - mesos_config
 
-- name: Template Mesos base /etc/default file
+- name: Template Mesos master startup script
   template:
-    src: base-defaults.j2
-    dest: /etc/default/mesos
-  tags:
-    - mesos
-    - mesos_config
-
-- name: Template Mesos master /etc/default file
-  template:
-    src: master-defaults.j2
-    dest: /etc/default/mesos-master
+    src: master-startup.sh.j2
+    dest: "/usr/bin/mesos-master-{{ safe_mesos_cluster_name }}_startup"
+    mode: 0755
   when: '"master" in mesos_roles'
   tags:
     - mesos
     - mesos_config
     - mesos_master
 
-- name: Template Mesos slave /etc/default file
+- name: Template Mesos slave startup script
   template:
-    src: slave-defaults.j2
-    dest: /etc/default/mesos-slave
+    src: slave-startup.sh.j2
+    dest: "/usr/bin/mesos-slave-{{ safe_mesos_cluster_name }}_startup"
+    mode: 0755
   when: '"slave" in mesos_roles'
   tags:
     - mesos
@@ -165,8 +149,6 @@
   template:
     src: mesos-master.monit.j2
     dest: "/etc/monit.d/mesos-{{ safe_mesos_cluster_name }}-master"
-  notify:
-    - Reload Monit
   when: '"master" in mesos_roles'
   register: mesos_master_monit
   tags:
@@ -178,8 +160,6 @@
   template:
     src: mesos-slave.monit.j2
     dest: "/etc/monit.d/mesos-{{ safe_mesos_cluster_name }}-slave"
-  notify:
-    - Reload Monit
   when: '"slave" in mesos_roles'
   register: mesos_slave_monit
   tags:
@@ -198,7 +178,7 @@
 
 - name: Wait for Monit to get its act together
   pause:
-    seconds: 5
+    seconds: 10
   when: mesos_master_monit.changed or mesos_slave_monit.changed
   tags:
     - mesos

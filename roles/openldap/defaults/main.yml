@@ -6,6 +6,7 @@ openldap_roles:
 openldap_schemas:
   - base
   - users_and_groups
+  - dev_user
 
 openldap_user: ldap
 openldap_group: ldap

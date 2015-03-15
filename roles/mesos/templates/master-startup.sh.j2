@@ -1,0 +1,18 @@
+#!/bin/bash
+# {{ ansible_managed }}
+# Starts the Mesos master process for cluster '{{ mesos_cluster_name }}'.
+
+
+ulimit {{ mesos_ulimit_options }}
+
+MESOS_MASTER_ARGS=(
+  --cluster='{{ mesos_cluster_name }}'
+  --ip='{{ mesos_ip }}'
+  --log_dir='{{ mesos_log_dir }}/{{ safe_mesos_cluster_name }}/master'
+  --port='{{ mesos_master_port }}'
+  --quorum='{{ mesos_quorum_size }}'
+  --work_dir='{{ mesos_work_dir }}/{{ safe_mesos_cluster_name }}/master'
+  --zk="$(cat /etc/mesos/zk)"
+)
+
+exec /usr/sbin/mesos-master "${MESOS_MASTER_ARGS[@]}"

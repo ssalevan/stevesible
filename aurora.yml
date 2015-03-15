@@ -26,5 +26,3 @@
     - role: aurora
       aurora_schedulers: "{{ groups['aurora']|join(',') }}"
       aurora_zookeeper_quorum: "{{ groups['aurora']|join(',') }}"
-
-    - role: openldap

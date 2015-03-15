@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+# Ensures that daemon running Thermos observer is monitored.
+
+check process thermos-observer with pidfile {{ thermos_state_dir }}/observer.pid
+  if failed host localhost port {{ thermos_observer_port }} type tcp for {{ thermos_observer_failure_cycles_before_restart }} cycles then restart
+  start program = "{{ thermos_bin_dir }}/{{ thermos_version }}/observer_control start"
+  stop program = "{{ thermos_bin_dir }}/{{ thermos_version }}/observer_control stop"
