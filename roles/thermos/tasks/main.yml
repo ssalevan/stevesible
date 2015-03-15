@@ -11,7 +11,6 @@
     recurse: yes
   with_items:
     - "{{ thermos_bin_dir }}/{{ thermos_version }}"
-    - "{{ thermos_state_dir }}/{{ thermos_observer_root_path }}"
     - "{{ thermos_log_dir }}"
   tags:
     - thermos
@@ -20,11 +19,7 @@
   get_url:
     url: "{{ thermos_mirror_base }}/{{ thermos_version }}/thermos/mesos-{{ mesos_version }}/{{ ansible_os_family }}/{{ ansible_lsb.major_release }}/{{ item }}.pex"
     dest: "{{ thermos_bin_dir }}/{{ thermos_version }}/{{ item }}"
-  with_items:
-    - gc_executor
-    - thermos_executor
-    - thermos_observer
-    - thermos_runner
+  with_items: thermos_binaries
   tags:
     - thermos
 
@@ -32,11 +27,7 @@
   file:
     path: "{{ thermos_bin_dir }}/{{ thermos_version }}/{{ item }}"
     mode: 0755
-  with_items:
-    - gc_executor
-    - thermos_executor
-    - thermos_observer
-    - thermos_runner
+  with_items: thermos_binaries
   tags:
     - thermos
 

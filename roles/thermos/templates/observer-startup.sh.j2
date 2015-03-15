@@ -3,7 +3,7 @@
 # Starts up a Thermos observer process.
 
 OBSERVER_ARGS=(
-  --root={{ thermos_state_dir }}/{{ thermos_observer_root_path }}
+  --root={{ thermos_state_dir }}
   --port={{ thermos_observer_port }}
   --log_to_disk=NONE
   --log_to_stderr=google:{{ thermos_observer_log_level }}

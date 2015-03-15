@@ -129,3 +129,32 @@
   tags:
     - aurora
     - aurora_config
+
+- name: Download Aurora client binaries
+  get_url:
+    url: "{{ aurora_mirror_base }}/{{ aurora_version }}/{{ item }}.pex"
+    dest: "/usr/bin/{{ item }}"
+  with_items: aurora_client_binaries
+  when: "'client' in aurora_roles"
+  tags:
+    - aurora
+    - aurora_client
+
+- name: Ensure that Aurora client binaries are executable
+  file:
+    path: "/usr/bin/{{ item }}"
+    mode: 0755
+  with_items: aurora_client_binaries
+  when: "'client' in aurora_roles"
+  tags:
+    - aurora
+    - aurora_client
+
+- name: Template a cluster configuration file for Aurora client binaries
+  template:
+    src: clusters.json.j2
+    dest: "{{ aurora_conf_dir }}/clusters.json"
+  when: "'client' in aurora_roles"
+  tags:
+    - aurora
+    - aurora_client

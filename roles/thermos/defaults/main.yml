@@ -3,6 +3,12 @@ thermos_roles:
   - executor
   - observer
 
+thermos_binaries:
+  - gc_executor
+  - thermos_executor
+  - thermos_observer
+  - thermos_runner
+
 thermos_version: "{{ aurora_version|default('0.7.0-RC3') }}"
 
 thermos_mirror_base: "{{ aurora_mirror_base|default('https://s3.amazonaws.com/aurorabuilds') }}"
@@ -10,7 +16,6 @@ thermos_mirror_base: "{{ aurora_mirror_base|default('https://s3.amazonaws.com/au
 thermos_bin_dir: /usr/bin/thermos
 thermos_log_dir: /var/log/thermos
 thermos_state_dir: /var/run/thermos
-thermos_observer_root_path: root
 
 thermos_observer_port: 1338
 thermos_observer_log_level: INFO
