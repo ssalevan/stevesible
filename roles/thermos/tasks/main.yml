@@ -12,6 +12,7 @@
   with_items:
     - "{{ thermos_bin_dir }}/{{ thermos_version }}"
     - "{{ thermos_log_dir }}"
+    - "{{ thermos_state_dir }}"
   tags:
     - thermos
 
