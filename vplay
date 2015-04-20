@@ -1,0 +1,16 @@
+#!/bin/bash
+# Executes an Ansible playbook against a bootstrapped node.
+
+DIR=$(git rev-parse --show-toplevel)
+
+source ${DIR}/env/bin/activate
+
+ANSIBLE_EXIT=0
+pushd ${DIR}/ansible > /dev/null
+
+ansible-playbook -u vagrant -i ./vagrant "${@}"
+ANSIBLE_EXIT=${?}
+
+popd > /dev/null
+
+exit ${ANSIBLE_EXIT}
