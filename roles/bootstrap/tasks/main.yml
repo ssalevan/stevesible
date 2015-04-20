@@ -1,6 +1,6 @@
 ---
 - name: Generate a new base user password
-  local_action: "shell openssl rand -base64 64 | tr -cd '[:alnum:]'"
+  shell: "openssl rand -base64 64 | tr -cd '[:alnum:]'"
   register: base_user_password
   tags:
     - bootstrap
@@ -23,6 +23,7 @@
     - python-keyczar
     - python-pip
     - screen
+    - unzip
     - vim
     - zsh
   tags:
@@ -56,6 +57,11 @@
   notify:
     - Reload Monit
 
+- name: Ensure that Monit is loaded with latest configs
+  service:
+    name: monit
+    state: reloaded
+
 - name: Enable iptables service is running
   service:
     name: iptables
@@ -80,9 +86,15 @@
   notify:
     - Reload iptables configuration
 
+- name: Create initial user's group
+  group:
+    name: "{{ base_group }}"
+    state: present
+
 - name: Create initial user
   user:
     name: "{{ base_user }}"
+    group: "{{ base_group }}"
     password: "{{ base_user_password.stdout }}"
     shell: /bin/zsh
 
@@ -90,17 +102,16 @@
   file:
     path: /home/{{ base_user }}/.ssh
     owner: "{{ base_user }}"
-    group: "{{ base_user }}"
+    group: "{{ base_group }}"
     mode: 0700
     state: directory
 
-- name: Add authorized_keys to initial user's directory
-  template:
-    src: authorized_keys.j2
-    dest: "/home/{{ base_user }}/.ssh/authorized_keys"
-    owner: "{{ base_user }}"
-    group: "{{ base_group }}"
-    mode: 0600
+- name: Add initial user's authorized keys
+  authorized_key:
+    user: "{{ base_user }}"
+    key: "{{ item }}"
+    state: present
+  with_items: authorized_keys
 
 - name: Make SSHD configuration sane
   template:
@@ -113,17 +124,38 @@
     - Restart sshd monit
 
 - name: Clone oh-my-zsh repo for initial user
-  remote_user: "{{ base_user }}"
+  sudo_user: "{{ base_user }}"
   git:
     repo: https://github.com/robbyrussell/oh-my-zsh.git
     dest: "/home/{{ base_user }}/.oh-my-zsh"
+  when: not zprezto
 
-- name: Deploy .zshrc
+- name: Deploy .zshrc for oh-my-zsh
   template:
     src: zshrc.j2
     dest: "/home/{{ base_user }}/.zshrc"
     owner: "{{ base_user }}"
     group: "{{ base_group }}"
+  when: not zprezto
+
+- name: Clone zprezto for inital user
+  remote_user: "{{ base_user }}"
+  git:
+    repo: https://github.com/sorin-ionescu/prezto.git
+    dest: "/home/{{ base_user }}/.zprezto"
+    recursive: yes
+  when: zprezto
+
+- name: Deploy zsh files for zprezto
+  file: src="{{ runcoms }}/{{ item }}" dest="/home/{{ base_user }}/{{ item }}" state=link
+  with_items:
+    - zlogin
+    - zlogout
+    - zpreztorc
+    - zprofile
+    - zshenv
+    - zshrc
+  when: zprezto
 
 - name: Configure sudoers to allow for sudoable user
   lineinfile:
@@ -151,7 +183,7 @@
   notify:
     - Reload Monit
 
-- name: Ensure Postfix service running
+- name: Ensure Postfix service is running
   service:
     name: postfix
     state: started

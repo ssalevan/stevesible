@@ -10,3 +10,7 @@ logwatch_email: root@localhost
 sshd_port: 22
 
 zsh_theme: candy
+
+# when false installs oh-my-zsh instead
+zprezto: false
+runcoms: "/home/{{ base_user }}/.zprezto/runcoms"

@@ -27,6 +27,7 @@
       - slave
     openldap_domain_name: spi.ne
     zookeeper_hosts: 127.0.0.1
+    zprezto: true
 
   roles:
     - docker
@@ -34,4 +35,4 @@
     - mesos
     - thermos
     - aurora
-    - openldap
+    #- openldap
