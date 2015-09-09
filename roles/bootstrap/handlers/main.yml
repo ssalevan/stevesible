@@ -1,9 +1,26 @@
 ---
 - name: Reload iptables configuration
   command: /usr/sbin/ferm /etc/ferm/ferm.conf
+  notify: Save iptables configuration
+  tags:
+    - bootstrap
+
+- name: Save iptables configuration
   command: service iptables save
+  tags:
+    - bootstrap
+
+- name: Ensure that iptables service is running
+  service:
+    name: iptables
+    state: started
+    enabled: yes
+  tags:
+    - bootstrap
 
 - name: Restart sshd monit
   monit:
     name: sshd
     state: restarted
+  tags:
+    - bootstrap

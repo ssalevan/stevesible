@@ -1,0 +1,26 @@
+---
+provision_vars:
+  es_master:
+    ec2_instance_type: m3.medium
+    ec2_image: ami-81d092b1
+    ec2_region: us-west-2
+    ec2_route53_zone: es.stevesible.biz.
+    ec2_create_ebs_volume: false
+    ec2_security_group: elasticsearch_sg
+    ec2_vpc_subnet_id: subnet-1234567
+    ec2_tags:
+      ansible_group: es_master
+      organization: stevesible
+
+  es_data:
+    ec2_instance_type: r3.xlarge
+    ec2_image: ami-81d092b1
+    ec2_region: us-west-2
+    ec2_route53_zone: es.stevesible.biz.
+    ec2_create_ebs_volume: false
+    ec2_security_group: elasticsearch_sg
+    ec2_vpc_subnet_id: subnet-1234567
+    ec2_tags:
+      ansible_group: es_data
+      organization: stevesible
+    ec2_format_volume: /dev/xvdb

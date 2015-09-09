@@ -1,0 +1,125 @@
+---
+- include: RedHat.yml
+  when: ansible_os_family == "RedHat"
+  tags:
+    - elasticsearch
+
+- name: Ensure that Elasticsearch group is created
+  group:
+    name: "{{ elasticsearch_group }}"
+  tags:
+    - elasticsearch
+
+- name: Ensure that Elasticsearch user is created
+  user:
+    name: "{{ elasticsearch_user }}"
+    group: "{{ elasticsearch_group }}"
+  tags:
+    - elasticsearch
+
+- name: Ensure that Elasticsearch directories are created and properly owned
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ elasticsearch_user }}"
+    group: "{{ elasticsearch_group }}"
+    recurse: yes
+  with_items:
+    - "{{ elasticsearch_conf_dir }}"
+    - "{{ elasticsearch_log_dir }}"
+    - "{{ elasticsearch_data_dir }}"
+    - "{{ elasticsearch_work_dir }}"
+    - "{{ elasticsearch_plugin_dir }}"
+  tags:
+    - elasticsearch
+
+- name: Mount the Elasticsearch EBS volume as the data directory
+  mount:
+    name: "{{ elasticsearch_data_dir }}"
+    src: /dev/xvdb
+    fstype: ext4
+    state: present
+  when: elasticsearch_node_data
+  tags:
+    - elasticsearch
+
+- name: Install Elasticsearch AWS plugin
+  include: aws.yml
+  when: elasticsearch_install_aws_plugin
+  tags:
+    - elasticsearch
+
+- name: Install ElasticHQ monitoring plugin
+  include: elastichq.yml
+  when: elasticsearch_install_elastichq_plugin
+  tags:
+    - elasticsearch
+
+- name: Install Elasticsearch Marvel plugin
+  include: marvel.yml
+  when: elasticsearch_install_marvel_plugin
+  tags:
+    - elasticsearch
+
+- name: Configure Elasticsearch
+  template:
+    src: elasticsearch.yml.j2
+    dest: "{{ elasticsearch_conf_dir }}/elasticsearch.yml"
+    owner: "{{ elasticsearch_user }}"
+    group: "{{ elasticsearch_group }}"
+    mode: 0644
+  when: elasticsearch_conf_dir is defined
+  notify: Restart Elasticsearch
+  tags:
+    - elasticsearch
+
+- name: Write an Elasticsearch sysconfig
+  template:
+    src: sysconfig.j2
+    dest: /etc/sysconfig/elasticsearch
+    owner: "{{ elasticsearch_user }}"
+    group: "{{ elasticsearch_group }}"
+    mode: 0644
+  notify: Restart Elasticsearch
+  tags:
+    - elasticsearch
+
+- name: Ensure that Elasticsearch service is running
+  service:
+    name: elasticsearch
+    state: started
+    enabled: yes
+  tags:
+    - elasticsearch
+
+- name: Write an Elasticsearch monit configuration
+  template:
+    src: elasticsearch.monit.j2
+    dest: /etc/monit.d/elasticsearch.conf
+  register: elasticsearch_monit
+  notify:
+    - Reload Monit
+  tags:
+    - elasticsearch
+
+- name: Ensure that Monit is loaded with latest configuration
+  service:
+    name: monit
+    state: reloaded
+  when: elasticsearch_monit.changed
+  tags:
+    - elasticsearch
+
+- name: Wait for Monit to get its act together
+  pause:
+    seconds: 10
+  when: elasticsearch_monit.changed
+  tags:
+    - elasticsearch
+
+- name: Ensure that Elasticsearch is monitored by Monit
+  monit:
+    name: elasticsearch
+    state: monitored
+  tags:
+    - elasticsearch

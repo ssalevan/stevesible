@@ -1,14 +1,28 @@
 #!/bin/bash
 # Runs bootstrapping playbooks against all hosts.
 
+DIR=$(git rev-parse --show-toplevel)
+
+source ${DIR}/env/bin/activate
+
 if [ $# -lt 1 ]; then
   echo
   echo "Runs the bootstrap script against all the nodes in the specified group."
-  echo "Usage: ./bootstrap ANSIBLE_GROUP"
+  echo "Usage: ./bootstrap ANSIBLE_GROUP [USER] [SHOULD_SUDO] [SET_HOSTNAME] [CREATE_BASE_USER] [FORMAT_VOLUME]"
   exit -1
 fi
 
 export ANSIBLE_GROUP="${1}"
+export ANSIBLE_USER="${2-ansibler}"
+export ANSIBLE_SHOULD_SUDO="${3-yes}"
+export ANSIBLE_SET_HOSTNAME="${4-no}"
+export ANSIBLE_CREATE_BASE_USER="${5-no}"
+export ANSIBLE_FORMAT_VOLUME="${6}"
+
+# Disables host key checking to support headless provisioning.
 export ANSIBLE_HOST_KEY_CHECKING=False
 
-ansible-playbook -u root -i ./linode bootstrap.yml
+# Purges any local EC2 cache to ensure that new nodes are detected.
+export PURGE_EC2_CACHE="true"
+
+env/bin/ansible-playbook -i ./inventory/ec2 bootstrap.yml

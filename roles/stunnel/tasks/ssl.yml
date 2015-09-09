@@ -1,0 +1,21 @@
+---
+- name: Add stunnel SSL certificate
+  template:
+    src: cert.pem.j2
+    dest: "{{ stunnel_cert }}"
+    owner: "{{ stunnel_user }}"
+    group: "{{ stunnel_group }}"
+    mode: 0600
+  notify:
+    - Restart stunnel via Monit
+
+- name: Add stunnel CA chain certificate (optional)
+  template:
+    src: cacert.pem.j2
+    dest: "{{ stunnel_ca_file }}"
+    owner: "{{ stunnel_user }}"
+    group: "{{ stunnel_group }}"
+    mode: 0600
+  when: stunnel_ca_file is defined and stunnel_ca_content is defined
+  notify:
+    - Restart stunnel via Monit

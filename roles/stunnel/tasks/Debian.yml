@@ -1,0 +1,12 @@
+---
+- name: Install stunnel packages
+  apt:
+    pkg: "{{ item }}"
+    update_cache: yes
+    cache_valid_time: 3600
+    state: installed
+  with_items:
+    - stunnel4
+    - ca-certificates
+  notify:
+    - Restart stunnel via monit

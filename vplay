@@ -1,0 +1,9 @@
+#!/bin/bash
+# Executes an Ansible playbook with all vault credentials.
+
+
+DIR=$(git rev-parse --show-toplevel)
+
+source ${DIR}/env/bin/activate
+
+env/bin/ansible-playbook --ask-vault-pass -e @vault/creds.yml -u ansibler -i ./inventory/ec2 "${@}"

@@ -1,0 +1,19 @@
+---
+- name: Check if Elasticsearch AWS plugin has been installed
+  stat:
+    path: "{{ elasticsearch_plugin_dir }}/cloud-aws"
+  register: aws_plugin_dir
+
+- name: Install Elasticsearch AWS plugin
+  shell: bin/plugin -i elasticsearch/elasticsearch-cloud-aws/{{ elasticsearch_plugin_aws_version }}
+  args:
+    chdir: "{{ elasticsearch_home_dir }}"
+  when: not aws_plugin_dir.stat.exists
+
+- name: Ensure that all plugin contents are properly owned
+  file:
+    path: "{{ elasticsearch_plugin_dir }}"
+    state: directory
+    owner: "{{ elasticsearch_user }}"
+    group: "{{ elasticsearch_group }}"
+    recurse: yes

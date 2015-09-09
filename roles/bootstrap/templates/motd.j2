@@ -1,11 +1,23 @@
-====================================================================
+=====================================================================
+
+                  ,,                     ,,
+      .g8"""bgd   db    mm               db
+    .dP'     `M         MM
+    dM'       ` `7MM  mmMMmm  `7Mb,od8 `7MM  `7MMpMMMb.   .gP"Ya
+    MM            MM    MM      MM' "'   MM    MM    MM  ,M'   Yb
+    MM.           MM    MM      MM       MM    MM    MM  8M""""""
+    `Mb.     ,'   MM    MM      MM       MM    MM    MM  YM.    ,
+      `"bmmmd'  .JMML.  `Mbmo .JMML.   .JMML..JMML  JMML. `Mbmmd'
+
+=====================================================================
 
 WARNING: Unauthorized access to this system is forbidden and will be
-  prosecuted by law. By accessing this system, you agree that your  
+  prosecuted by law. By accessing this system, you agree that your
     actions may be monitored if unauthorized usage is suspected.
 
-====================================================================
-Public IP: {{ ansible_eth0.ipv4.address }}
+=====================================================================
+Public IP: {{ inventory_hostname }}
+Private IP: {{ ansible_eth0.ipv4.address }}
 Hostname: {{ ansible_hostname }}
 {% for group in group_names %}
 Group: {{ group }}
@@ -14,4 +26,4 @@ Cores: {{ ansible_processor_cores }}
 RAM: {{ ansible_memtotal_mb }} MB
 
 Last Bootstrap: {{ ansible_date_time.date }} {{ ansible_date_time.time }} {{ ansible_date_time.tz }}
-====================================================================
+=====================================================================

@@ -1,0 +1,34 @@
+---
+elasticsearch_cluster_name: ansible
+
+elasticsearch_plugin_aws_tag_filters:
+  ansible_group: elasticsearch
+
+elasticsearch_node_name: "{{ ec2_tag_Name }}"
+
+elasticsearch_user: elasticsearch
+elasticsearch_group: elasticsearch
+
+elasticsearch_version: 1.7
+
+elasticsearch_gpg_key_url: https://packages.elasticsearch.org/GPG-KEY-elasticsearch
+elasticsearch_yum_repo_url: "https://packages.elasticsearch.org/elasticsearch/{{ elasticsearch_version }}/centos"
+
+elasticsearch_install_elastichq_plugin: true
+
+elasticsearch_total_ram_pct: 0.50
+
+elasticsearch_install_aws_plugin: true
+elasticsearch_plugin_aws_version: 2.6.0
+elasticsearch_plugin_aws_region: us-west-2
+elasticsearch_plugin_marvel_version: latest
+
+elasticsearch_install_marvel_plugin: false
+
+elasticsearch_max_open_files: 65535
+elasticsearch_home_dir: /usr/share/elasticsearch
+elasticsearch_plugin_dir: /usr/share/elasticsearch/plugins
+elasticsearch_log_dir: /var/log/elasticsearch
+elasticsearch_data_dir: /var/lib/elasticsearch
+elasticsearch_work_dir: /tmp/elasticsearch
+elasticsearch_conf_dir: /etc/elasticsearch

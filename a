@@ -1,0 +1,8 @@
+#!/bin/bash
+# Executes an Ansible command.
+
+DIR=$(git rev-parse --show-toplevel)
+
+source ${DIR}/env/bin/activate
+
+env/bin/ansible -u ansibler -i ./inventory/ec2 "${@}"

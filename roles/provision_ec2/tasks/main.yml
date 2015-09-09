@@ -1,0 +1,88 @@
+---
+- name: Create a new SSH keypair (if requested)
+  local_action:
+    module: ec2_key
+    name: "{{ ec2_keypair_name }}"
+    region: "{{ ec2_region }}"
+    key_material: "{{ ec2_ssh_key }}"
+  when: ec2_create_new_keypair
+  tags:
+    - provision_ec2
+
+- name: Provision new EC2 instance(s)
+  local_action:
+    module: ec2
+    image: "{{ ec2_image }}"
+    instance_type: "{{ ec2_instance_type }}"
+    keypair: "{{ ec2_keypair_name }}"
+    count: "{{ ec2_quantity }}"
+    instance_tags: "{{ ec2_tags }}"
+    region: "{{ ec2_region }}"
+    group: "{{ ec2_security_group }}"
+    assign_public_ip: "{{ ec2_assign_public_ip }}"
+    vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
+    wait: true
+  register: ec2_new_nodes
+  tags:
+    - provision_ec2
+
+- name: Set unique names for all freshly-provisioned nodes
+  local_action:
+    module: ec2_tag
+    resource: "{{ item.id }}"
+    region: "{{ ec2_region }}"
+    tags:
+      Name: "{{ ec2_base_name }}_{{ 999999999 | random }}"
+  with_items: ec2_new_nodes.instances
+  tags:
+    - provision_ec2
+
+- name: Create a new private DNS record for each node in Route53
+  local_action:
+    module: route53
+    command: create
+    record: "{{ item.id }}.{{ ec2_route53_zone }}"
+    value: "{{ item.private_ip }}"
+    zone: "{{ ec2_route53_zone }}"
+    type: A
+    ttl: 7200
+    private_zone: true
+  with_items: ec2_new_nodes.instances
+  tags:
+    - provision_ec2
+
+- name: Wait for SSH to come up on new nodes
+  local_action:
+    module: wait_for
+    host: "{{ item.public_dns_name }}"
+    port: 22
+  with_items: ec2_new_nodes.instances
+  tags:
+    - provision_ec2
+
+- name: Create and add EBS volume (if requested)
+  local_action:
+    module: ec2_vol
+    instance: "{{ item.id }}"
+    volume_size: "{{ ec2_ebs_size_gb }}"
+    device_name: "{{ ec2_ebs_device_name }}"
+    volume_type: "{{ ec2_ebs_volume_type }}"
+    region: "{{ ec2_region }}"
+  with_items: ec2_new_nodes.instances
+  when: ec2_create_ebs_volume
+  tags:
+    - provision_ec2
+
+- name: Echo all node bootstrap commands in case of failure
+  local_action:
+    module: debug
+    msg: "Executing: ./bootstrap {{ item.id }} {{ ec2_bootstrap_user }} {{ ec2_bootstrap_should_sudo }} {{ item.id }}.{{ ec2_route53_zone }} {{ ec2_bootstrap_create_base_user }} {{ ec2_format_volume }}"
+  with_items: ec2_new_nodes.instances
+  tags:
+    - provision_ec2
+
+- name: Run bootstrap script for new nodes
+  local_action: "shell ./bootstrap {{ item.id }} {{ ec2_bootstrap_user }} {{ ec2_bootstrap_should_sudo }} {{ item.id }}.{{ ec2_route53_zone }} {{ ec2_bootstrap_create_base_user }} {{ ec2_format_volume }}"
+  with_items: ec2_new_nodes.instances
+  tags:
+    - provision_ec2

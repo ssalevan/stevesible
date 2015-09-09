@@ -1,0 +1,9 @@
+---
+- include: ../../monit/handlers/main.yml
+
+- name: Restart stunnel via Monit
+  monit:
+    name: stunnel
+    state: restarted
+  tags:
+    - stunnel

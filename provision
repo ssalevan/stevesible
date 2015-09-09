@@ -4,10 +4,15 @@
 if [ $# -lt 1 ]; then
   echo
   echo "Runs the provisioning script for a node in the provided group"
-  echo "Usage: ./provision ANSIBLE_GROUP"
+  echo "Usage: ./provision ANSIBLE_GROUP [NUM_NODES]"
   exit -1
 fi
 
-export ANSIBLE_GROUP="${1}"
+DIR=$(git rev-parse --show-toplevel)
 
-ansible-playbook -i ./local provision.yml
+export ANSIBLE_GROUP="${1}"
+export NUM_NODES="${2-1}"
+
+source ${DIR}/env/bin/activate
+
+env/bin/ansible-playbook -f ${NUM_NODES} -i ./inventory/local provision.yml

@@ -1,0 +1,28 @@
+---
+- name: Establishes and maintains Elasticsearch master nodes
+  hosts: tag_ansible_group_es_master
+  sudo: true
+
+  vars:
+    elasticsearch_cluster_name: stevesible
+    elasticsearch_discovery_zen_minimum_master_nodes: 1
+    elasticsearch_discovery_zen_ping_multicast_enabled: false
+    elasticsearch_node_master: true
+    elasticsearch_node_data: false
+    elasticsearch_plugin_aws_access_key: "{{ vault_aws_access_key }}"
+    elasticsearch_plugin_aws_secret_key: "{{ vault_aws_secret_key }}"
+    elasticsearch_plugin_aws_tag_filters:
+      organization: stevesible
+    newrelic_license_key: "{{ vault_newrelic_license_key }}"
+    stunnel_ca_content: "{{ vault_stunnel_ca_content }}"
+    stunnel_cert_content: "{{ vault_stunnel_cert_content }}"
+    stunnel_services:
+      - name: elasticsearch_api
+        accept_host: 0.0.0.0
+        accept_port: 9201
+        connect_host: 127.0.0.1
+        connect_port: 9200
+
+  roles:
+    - elasticsearch
+    - stunnel

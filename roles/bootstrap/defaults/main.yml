@@ -2,6 +2,37 @@
 authorized_keys:
   - "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
 
+bootstrap_set_hostname: no
+bootstrap_create_base_user: no
+bootstrap_format_ebs_volume: no
+
+bootstrap_packages:
+  - bind-utils
+  - collectd
+  - fail2ban
+  - ferm
+  - htop
+  - iftop
+  - java-1.8.0-openjdk
+  - java-1.8.0-openjdk-devel
+  - logwatch
+  - mtr
+  - nc
+  - postfix
+  - python-keyczar
+  - python-pip
+  - screen
+  - vim
+  - zsh
+
+bootstrap_open_ports:
+  - tcp: 22
+  - tcp: 80
+  - tcp: 443
+  - tcp: 9200
+  - tcp: 9201
+  - tcp: 9300
+
 base_group: ansibler
 base_user: ansibler
 

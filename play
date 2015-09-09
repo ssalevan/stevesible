@@ -1,4 +1,9 @@
 #!/bin/bash
 # Executes an Ansible playbook against a bootstrapped node.
 
-ansible-playbook -u ansibler -i ./linode "${@}"
+
+DIR=$(git rev-parse --show-toplevel)
+
+source ${DIR}/env/bin/activate
+
+env/bin/ansible-playbook -u ansibler -i ./inventory/ec2 "${@}"

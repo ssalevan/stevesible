@@ -2,29 +2,29 @@
 - name: Generate a new base user password
   local_action: "shell openssl rand -base64 64 | tr -cd '[:alnum:]'"
   register: base_user_password
+  when: bootstrap_create_base_user
   tags:
     - bootstrap
+
+- name: Set hostname (if requested)
+  hostname:
+    name: "{{ bootstrap_set_hostname }}"
+  when: bootstrap_set_hostname != ''
+  tags:
+    - bootstrap
+    - system_update
+
+- name: Format requested volume (if requested)
+  filesystem:
+    fstype: ext4
+    dev: "{{ bootstrap_format_ebs_volume }}"
+  when: bootstrap_format_ebs_volume != ''
 
 - name: Install bootstrap packages
   yum:
     name: "{{ item }}"
     state: present
-  with_items:
-    - collectd
-    - fail2ban
-    - ferm
-    - htop
-    - iftop
-    - java-1.7.0-openjdk
-    - logwatch
-    - mtr
-    - nc
-    - postfix
-    - python-keyczar
-    - python-pip
-    - screen
-    - vim
-    - zsh
+  with_items: bootstrap_packages
   tags:
     - bootstrap
 
@@ -55,12 +55,8 @@
     mode: 0644
   notify:
     - Reload Monit
-
-- name: Enable iptables service is running
-  service:
-    name: iptables
-    state: started
-    enabled: yes
+  tags:
+    - bootstrap
 
 - name: Add ferm conf directory
   file:
@@ -69,6 +65,8 @@
     group: root
     mode: 0700
     state: directory
+  tags:
+    - bootstrap
 
 - name: Set iptables configuration
   template:
@@ -79,28 +77,37 @@
     mode: 0644
   notify:
     - Reload iptables configuration
+  tags:
+    - bootstrap
 
 - name: Create initial user
   user:
     name: "{{ base_user }}"
     password: "{{ base_user_password.stdout }}"
     shell: /bin/zsh
+  when: bootstrap_create_base_user
+  tags:
+    - bootstrap
 
 - name: Create initial user's .ssh directory
   file:
-    path: /home/{{ base_user }}/.ssh
+    path: "/home/{{ base_user }}/.ssh"
     owner: "{{ base_user }}"
     group: "{{ base_user }}"
     mode: 0700
     state: directory
+  when: bootstrap_create_base_user
+  tags:
+    - bootstrap
 
-- name: Add authorized_keys to initial user's directory
-  template:
-    src: authorized_keys.j2
-    dest: "/home/{{ base_user }}/.ssh/authorized_keys"
-    owner: "{{ base_user }}"
-    group: "{{ base_group }}"
-    mode: 0600
+- name: Add initial user's authorized keys
+  authorized_key:
+    user: "{{ base_user }}"
+    key: "{{ item }}"
+    state: present
+  with_items: authorized_keys
+  tags:
+    - bootstrap
 
 - name: Make SSHD configuration sane
   template:
@@ -111,12 +118,17 @@
     mode: 0600
   notify:
     - Restart sshd monit
+  tags:
+    - bootstrap
 
 - name: Clone oh-my-zsh repo for initial user
   remote_user: "{{ base_user }}"
   git:
     repo: https://github.com/robbyrussell/oh-my-zsh.git
     dest: "/home/{{ base_user }}/.oh-my-zsh"
+  when: bootstrap_create_base_user
+  tags:
+    - bootstrap
 
 - name: Deploy .zshrc
   template:
@@ -124,6 +136,9 @@
     dest: "/home/{{ base_user }}/.zshrc"
     owner: "{{ base_user }}"
     group: "{{ base_group }}"
+  when: bootstrap_create_base_user
+  tags:
+    - bootstrap
 
 - name: Configure sudoers to allow for sudoable user
   lineinfile:
@@ -133,6 +148,9 @@
     regexp: "^%{{ base_user }}"
     insertafter: "^# %wheel"
     line: "%{{ base_user }} ALL=(ALL) NOPASSWD: ALL"
+  when: bootstrap_create_base_user
+  tags:
+    - bootstrap
 
 - name: Configure sudoers to allow for non-tty sudo
   lineinfile:
@@ -140,6 +158,9 @@
     backup: yes
     state: absent
     regexp: "^Defaults.*requiretty"
+  when: bootstrap_create_base_user
+  tags:
+    - bootstrap
 
 - name: Add Postfix monit config
   template:
@@ -150,12 +171,16 @@
     mode: 0644
   notify:
     - Reload Monit
+  tags:
+    - bootstrap
 
-- name: Ensure Postfix service running
+- name: Ensure that Postfix service is running
   service:
     name: postfix
     state: started
     enabled: yes
+  tags:
+    - bootstrap
 
 - name: Configure daily logwatch e-mails
   lineinfile:
@@ -164,6 +189,8 @@
     line: "    logwatch --output mail --mailto {{ logwatch_email }} --detail high"
     state: present
     create: yes
+  tags:
+    - bootstrap
 
 - name: Make the default screenrc suck less
   template:
@@ -172,3 +199,21 @@
     owner: root
     group: root
     mode: 0644
+  tags:
+    - bootstrap
+
+- name: use alternatives to configure jdk 1.8 java
+  alternatives:
+    name: java
+    path: /usr/lib/jvm/java-1.8.0-openjdk/bin/java
+    link: /usr/bin/java
+  tags:
+    - bootstrap
+
+- name: use alternatives to configure jdk 1.8 javac
+  alternatives:
+    name: javac
+    path: /usr/lib/jvm/java-1.8.0-openjdk/bin/javac
+    link: /usr/bin/javac
+  tags:
+    - bootstrap

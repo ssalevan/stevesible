@@ -1,6 +1,13 @@
 ---
 - name: Bootstrap new server node
   hosts: "{{ lookup('env', 'ANSIBLE_GROUP') }}"
+  remote_user: "{{ lookup('env', 'ANSIBLE_USER') }}"
+  sudo: "{{ lookup('env', 'ANSIBLE_SHOULD_SUDO') }}"
+
+  vars:
+    bootstrap_set_hostname: "{{ lookup('env', 'ANSIBLE_SET_HOSTNAME') }}"
+    bootstrap_create_base_user: "{{ lookup('env', 'ANSIBLE_CREATE_BASE_USER') }}"
+    bootstrap_format_ebs_volume: "{{ lookup('env', 'ANSIBLE_FORMAT_VOLUME') }}"
 
   roles:
-    - role: bootstrap
+    - bootstrap

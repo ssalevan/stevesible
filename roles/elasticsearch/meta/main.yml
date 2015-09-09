@@ -1,0 +1,10 @@
+---
+galaxy_info:
+  author: Steve Salevan <steve.salevan@gmail.com>
+  description: Installs and configures an Elasticsearch cluster
+  license: Apache 2
+  min_ansible_version: 1.7
+
+dependencies:
+  - lsb
+  - monit

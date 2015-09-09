@@ -1,7 +1,5 @@
 # {{ ansible_managed }}
 
-@def $NET_TRUSTED = 23.92.0.0/16;
-
 table filter {
   chain INPUT {
     policy DROP;
@@ -16,15 +14,11 @@ table filter {
     # respond to ping
     proto icmp icmp-type echo-request ACCEPT;
 
-    # allow SSH connections
-    proto tcp dport ssh ACCEPT;
-
-    # our services to the world
-    proto tcp dport (http https ssh) ACCEPT;
-
-{% if 'databases' in group_names %}
-    saddr $NET_TRUSTED proto tcp dport 5432 ACCEPT;
-{% endif %}
+{% for port_description in bootstrap_open_ports %}
+{% for proto, port in port_description.iteritems() %}
+    proto {{ proto }} dport {{ port }} ACCEPT;
+{% endfor %}
+{% endfor %}
     # the rest is dropped by the above policy
   }
 

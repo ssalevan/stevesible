@@ -1,6 +1,25 @@
 ---
-- name: Request and kickstart new instance from Linode
-  hosts: localhost
+- name: Request and kickstart new instance from EC2
+  hosts: local
+  gather_facts: false
+
+  vars:
+    ansible_group: "{{ lookup('env', 'ANSIBLE_GROUP') }}"
+    ec2_quantity: "{{ lookup('env', 'NUM_NODES') }}"
+    ec2_bootstrap_should_sudo: "{{ provision_vars[ansible_group]['ec2_bootstrap_should_sudo'] | default('no') }}"
+    ec2_bootstrap_user: "{{ provision_vars[ansible_group]['ec2_bootstrap_user'] | default('root') }}"
+    ec2_bootstrap_create_base_user: "{{ provision_vars[ansible_group]['ec2_bootstrap_user'] | default('yes') }}"
+    ec2_format_volume: "{{ provision_vars[ansible_group]['ec2_format_volume'] | default('') }}"
+    ec2_instance_type: "{{ provision_vars[ansible_group]['ec2_instance_type'] }}"
+    ec2_route53_zone: "{{ provision_vars[ansible_group]['ec2_route53_zone'] }}"
+    ec2_create_ebs_volume: "{{ provision_vars[ansible_group]['ec2_create_ebs_volume'] }}"
+    ec2_ebs_size_gb: "{{ provision_vars[ansible_group]['ec2_ebs_size_gb'] | default(0) }}"
+    ec2_ebs_volume_type: "{{ provision_vars[ansible_group]['ec2_ebs_volume_type'] | default('standard') }}"
+    ec2_image: "{{ provision_vars[ansible_group]['ec2_image'] }}"
+    ec2_region: "{{ provision_vars[ansible_group]['ec2_region'] }}"
+    ec2_security_group: "{{ provision_vars[ansible_group]['ec2_security_group'] }}"
+    ec2_tags: "{{ provision_vars[ansible_group]['ec2_tags'] | to_json }}"
+    ec2_vpc_subnet_id: "{{ provision_vars[ansible_group]['ec2_vpc_subnet_id'] }}"
 
   roles:
-    - provision_linode
+    - provision_ec2
