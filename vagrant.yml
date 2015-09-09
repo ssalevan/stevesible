@@ -1,0 +1,38 @@
+---
+- name: Establishes a unified environment across all hosts
+  hosts: all
+  sudo: true
+  vars:
+    base_user: vagrant
+  roles:
+    - bootstrap
+
+- name: Establishes a single-node Aurora cluster
+  hosts: all
+  sudo: true
+  vars:
+    aurora_schedulers: 127.0.0.1
+    aurora_zookeeper_quorum: 127.0.0.1
+    docker_roles:
+      - docker
+      - registry
+    datacenter_city: undefined
+    mesos_zookeeper_quorum: 127.0.0.1
+    mesos_containerizers:
+      - docker
+      - mesos
+    mesos_ip: 127.0.0.1
+    mesos_roles:
+      - master
+      - slave
+    openldap_domain_name: spi.ne
+    zookeeper_hosts: 127.0.0.1
+    zprezto: true
+
+  roles:
+    - docker
+    - zookeeper
+    - mesos
+    - thermos
+    - aurora
+    #- openldap

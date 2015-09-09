@@ -1,7 +1,6 @@
 #!/bin/bash
 # Executes an Ansible playbook with all vault credentials.
 
-
 DIR=$(git rev-parse --show-toplevel)
 
 source ${DIR}/env/bin/activate

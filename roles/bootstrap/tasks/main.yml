@@ -1,6 +1,6 @@
 ---
 - name: Generate a new base user password
-  local_action: "shell openssl rand -base64 64 | tr -cd '[:alnum:]'"
+  shell: "openssl rand -base64 64 | tr -cd '[:alnum:]'"
   register: base_user_password
   when: bootstrap_create_base_user
   tags:
@@ -80,9 +80,15 @@
   tags:
     - bootstrap
 
+- name: Create initial user's group
+  group:
+    name: "{{ base_group }}"
+    state: present
+
 - name: Create initial user
   user:
     name: "{{ base_user }}"
+    group: "{{ base_group }}"
     password: "{{ base_user_password.stdout }}"
     shell: /bin/zsh
   when: bootstrap_create_base_user
@@ -93,7 +99,7 @@
   file:
     path: "/home/{{ base_user }}/.ssh"
     owner: "{{ base_user }}"
-    group: "{{ base_user }}"
+    group: "{{ base_group }}"
     mode: 0700
     state: directory
   when: bootstrap_create_base_user
@@ -122,7 +128,7 @@
     - bootstrap
 
 - name: Clone oh-my-zsh repo for initial user
-  remote_user: "{{ base_user }}"
+  sudo_user: "{{ base_user }}"
   git:
     repo: https://github.com/robbyrussell/oh-my-zsh.git
     dest: "/home/{{ base_user }}/.oh-my-zsh"
@@ -130,7 +136,7 @@
   tags:
     - bootstrap
 
-- name: Deploy .zshrc
+- name: Deploy .zshrc for oh-my-zsh
   template:
     src: zshrc.j2
     dest: "/home/{{ base_user }}/.zshrc"
@@ -199,21 +205,5 @@
     owner: root
     group: root
     mode: 0644
-  tags:
-    - bootstrap
-
-- name: use alternatives to configure jdk 1.8 java
-  alternatives:
-    name: java
-    path: /usr/lib/jvm/java-1.8.0-openjdk/bin/java
-    link: /usr/bin/java
-  tags:
-    - bootstrap
-
-- name: use alternatives to configure jdk 1.8 javac
-  alternatives:
-    name: javac
-    path: /usr/lib/jvm/java-1.8.0-openjdk/bin/javac
-    link: /usr/bin/javac
   tags:
     - bootstrap
