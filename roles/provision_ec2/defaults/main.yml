@@ -24,7 +24,7 @@ ec2_ebs_volume_type: standard
 ec2_ebs_size_gb: 50
 
 ec2_assign_public_ip: true
-ec2_vpc_subnet_id: subnet-123456
+ec2_vpc_subnet_id: subnet-6b94e30e
 
 ec2_create_new_keypair: true
 ec2_keypair_name: "ansible_{{ lookup('env', 'USER') }}"
@@ -32,11 +32,12 @@ ec2_ssh_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
 
 ec2_security_group: elasticsearch_sg
 
-ec2_create_private_dns_record: false
-ec2_route53_zone: phil.collins.com
+ec2_create_route53_record: true
+ec2_route53_zone: phil.collins.com.
 
 ec2_region: us-west-2
 
 ec2_bootstrap_user: root
 ec2_bootstrap_should_sudo: false
 ec2_bootstrap_create_base_user: true
+ec2_bootstrap_should_format_volume: false

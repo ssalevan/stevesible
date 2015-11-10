@@ -76,13 +76,13 @@
 - name: Echo all node bootstrap commands in case of failure
   local_action:
     module: debug
-    msg: "Executing: ./bootstrap {{ item.id }} {{ ec2_bootstrap_user }} {{ ec2_bootstrap_should_sudo }} {{ item.id }}.{{ ec2_route53_zone }} {{ ec2_bootstrap_create_base_user }} {{ ec2_format_volume }}"
+    msg: "Executing: ./bootstrap {{ item.id }} {{ ec2_bootstrap_user }} {{ ec2_bootstrap_should_sudo }} {{ ec2_create_route53_record }} {{ ec2_bootstrap_create_base_user }} {{ ec2_bootstrap_should_format_volumes }} '{{ item.id }}.{{ ec2_route53_zone }}' '{{ ec2_format_volumes }}'"
   with_items: ec2_new_nodes.instances
   tags:
     - provision_ec2
 
 - name: Run bootstrap script for new nodes
-  local_action: "shell ./bootstrap {{ item.id }} {{ ec2_bootstrap_user }} {{ ec2_bootstrap_should_sudo }} {{ item.id }}.{{ ec2_route53_zone }} {{ ec2_bootstrap_create_base_user }} {{ ec2_format_volume }}"
+  local_action: "shell ./bootstrap {{ item.id }} {{ ec2_bootstrap_user }} {{ ec2_bootstrap_should_sudo }} {{ ec2_create_route53_record }} {{ ec2_bootstrap_create_base_user }} {{ ec2_bootstrap_should_format_volumes }} '{{ item.id }}.{{ ec2_route53_zone }}' '{{ ec2_format_volumes }}'"
   with_items: ec2_new_nodes.instances
   tags:
     - provision_ec2

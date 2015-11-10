@@ -14,11 +14,15 @@
     - bootstrap
     - system_update
 
-- name: Format requested volume (if requested)
+- name: Format volumes (if requested)
   filesystem:
     fstype: ext4
-    dev: "{{ bootstrap_format_ebs_volume }}"
-  when: bootstrap_format_ebs_volume != ''
+    force: yes
+    dev: "{{ item }}"
+  when: bootstrap_should_format_volumes == 'True'
+  with_items: bootstrap_volumes_to_format.split(',')
+  tags:
+    - bootstrap
 
 - name: Install bootstrap packages
   yum:
@@ -84,14 +88,16 @@
   group:
     name: "{{ base_group }}"
     state: present
+  when: bootstrap_should_create_base_user == 'True'
+  tags:
+    - bootstrap
 
 - name: Create initial user
   user:
     name: "{{ base_user }}"
-    group: "{{ base_group }}"
-    password: "{{ base_user_password.stdout }}"
+    password: "aweiofwepfw9fhewfpodsufnewifpeufhwbeibw4ioefwuehbfoiwefb"
     shell: /bin/zsh
-  when: bootstrap_create_base_user
+  when: bootstrap_should_create_base_user == 'True'
   tags:
     - bootstrap
 
@@ -99,10 +105,10 @@
   file:
     path: "/home/{{ base_user }}/.ssh"
     owner: "{{ base_user }}"
-    group: "{{ base_group }}"
+    group: "{{ base_user }}"
     mode: 0700
     state: directory
-  when: bootstrap_create_base_user
+  when: bootstrap_should_create_base_user == 'True'
   tags:
     - bootstrap
 
