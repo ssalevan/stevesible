@@ -1,6 +1,6 @@
 ---
 mesos_cluster_name: main
-mesos_version: 0.21.1
+mesos_version: 0.23.0
 
 mesos_roles:
   - master

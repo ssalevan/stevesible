@@ -4,33 +4,23 @@
   tags:
     - thermos
 
-- name: Ensure that Thermos directories exist
-  file:
-    path: "{{ item }}"
-    state: directory
-    recurse: yes
-  with_items:
-    - "{{ thermos_bin_dir }}/{{ thermos_version }}"
-    - "{{ thermos_log_dir }}"
-    - "{{ thermos_state_dir }}"
+- name: Ensure that the Aurora Yum repository is present
+  template:
+    src: ssalevan_aurora.repo.j2
+    dest: /etc/yum.repos.d/ssalevan_aurora.repo
+    mode: 0644
   tags:
     - thermos
 
-- name: Download Thermos binaries
-  get_url:
-    url: "{{ thermos_mirror_base }}/{{ thermos_version }}/thermos/mesos-{{ mesos_version }}/{{ ansible_os_family }}/{{ ansible_lsb.major_release }}/{{ item }}.pex"
-    dest: "{{ thermos_bin_dir }}/{{ thermos_version }}/{{ item }}"
-  with_items: thermos_binaries
-  tags:
-    - thermos
-
-- name: Ensure that Thermos binaries are executable
-  file:
-    path: "{{ thermos_bin_dir }}/{{ thermos_version }}/{{ item }}"
-    mode: 0755
-  with_items: thermos_binaries
+- name: Install the Aurora RPM
+  yum:
+    name: aurora-thermos
+    state: present
+    enablerepo: ssalevan_aurora
   tags:
     - thermos
 
 - include: observer.yml
   when: "'observer' in thermos_roles"
+  tags:
+    - thermos

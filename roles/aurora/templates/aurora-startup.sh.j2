@@ -15,14 +15,13 @@
 #
 
 # Location where aurora-scheduler.zip was unpacked.
-AURORA_SCHEDULER_HOME='{{ aurora_lib_dir }}/{{ aurora_version }}/aurora-scheduler-{{ aurora_version }}'
 AURORA_ZK_ENDPOINTS="$(cat {{ aurora_conf_dir }}/{{ safe_aurora_cluster_name }}/zk | rev | cut -c 2- | rev)"
 
 # Flags that control the behavior of the JVM.
 JAVA_OPTS=(
   -server
   # Location of libmesos-XXXX.so / libmesos-XXXX.dylib
-  -Djava.library.path='/usr/lib'
+  -Djava.library.path='/usr/lib;/usr/lib64'
 
 {% for jvm_flag in aurora_jvm_flags %}
   {{ jvm_flag }}
@@ -48,14 +47,13 @@ AURORA_FLAGS=(
   -native_log_file_path='{{ aurora_state_dir }}/{{ safe_aurora_cluster_name }}/{{ aurora_native_log_path }}'
   -backup_dir="{{ aurora_state_dir }}/{{ safe_aurora_cluster_name }}/{{ aurora_backup_path }}"
 
-  -thermos_executor_path='{{ thermos_bin_dir }}/{{ thermos_version }}/thermos_executor'
+  # The local path of the Thermos executor binary.
+  -thermos_executor_path='/usr/bin/thermos_executor'
+
+  # Flags to pass to the Thermos executor.
   -thermos_executor_flags="--announcer-enable --announcer-ensemble ${AURORA_ZK_ENDPOINTS}"
 
   -gc_executor_path='{{ thermos_bin_dir }}/{{ thermos_version }}/gc_executor'
-
-{% if aurora_enable_beta_updater %}
-  -enable_beta_updater=true
-{% endif %}
 
   -vlog='{{ aurora_log_level }}'
 
@@ -68,9 +66,8 @@ AURORA_FLAGS=(
 )
 
 # Environment variables control the behavior of the Mesos scheduler driver (libmesos).
-export GLOG_v=1
-export LIBPROCESS_PORT='{{ aurora_libprocess_port }}'
-export LIBPROCESS_IP='{{ mesos_ip }}'
-export JAVA_OPTS="${JAVA_OPTS[*]}"
+GLOG_v=1
+LIBPROCESS_PORT='{{ aurora_libprocess_port }}'
+LIBPROCESS_IP='{{ mesos_ip }}'
 
-exec "${AURORA_SCHEDULER_HOME}/bin/aurora-scheduler" "${AURORA_FLAGS[@]}"
+JAVA_OPTS="${JAVA_OPTS[*]}"

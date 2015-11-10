@@ -1,5 +1,16 @@
 ---
 provision_vars:
+  aurora:
+    ec2_instance_type: m3.medium
+    ec2_image: ami-81d092b1
+    ec2_region: us-west-2
+    ec2_route53_zone: aurora.stevesible.biz.
+    ec2_create_ebs_volume: false
+    ec2_security_group: aurora_sg
+    ec2_vpc_subnet_id: subnet-1234567
+    ec2_tags:
+      ansible_group: aurora
+
   es_master:
     ec2_instance_type: m3.medium
     ec2_image: ami-81d092b1
@@ -11,6 +22,7 @@ provision_vars:
     ec2_tags:
       ansible_group: es_master
       organization: stevesible
+      environment: prod
 
   es_data:
     ec2_instance_type: r3.xlarge
@@ -23,4 +35,9 @@ provision_vars:
     ec2_tags:
       ansible_group: es_data
       organization: stevesible
-    ec2_format_volume: /dev/xvdb
+      environment: prod
+    ec2_format_volumes: /dev/xvdb,/dev/xvdc
+    ec2_bootstrap_user: ansibler
+    ec2_bootstrap_should_sudo: True
+    ec2_bootstrap_should_format_volumes: True
+    ec2_bootstrap_create_base_user: False

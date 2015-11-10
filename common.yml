@@ -1,0 +1,7 @@
+---
+- name: Establishes a unified environment across all hosts
+  hosts: all
+  sudo: true
+
+  roles:
+    - bootstrap

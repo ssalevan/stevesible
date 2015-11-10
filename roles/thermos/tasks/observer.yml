@@ -1,26 +1,8 @@
 ---
-- name: Template the Thermos observer startup script
-  template:
-    src: observer-startup.sh.j2
-    dest: "{{ thermos_bin_dir }}/{{ thermos_version }}/observer_startup"
-    mode: 0755
-  tags:
-    - thermos
-    - thermos_observer
-
-- name: Template the Thermos observer control script
-  template:
-    src: observer-control.sh.j2
-    dest: "{{ thermos_bin_dir }}/{{ thermos_version }}/observer_control"
-    mode: 0755
-  tags:
-    - thermos
-    - thermos_observer
-
 - name: Ensure that the Thermos observer daemon is running
-  shell: "{{ thermos_bin_dir }}/{{ thermos_version }}/observer_control start"
-  args:
-    creates: "{{ thermos_state_dir }}/observer.pid"
+  service:
+    name: thermos
+    state: started
   tags:
     - thermos
     - thermos_observer

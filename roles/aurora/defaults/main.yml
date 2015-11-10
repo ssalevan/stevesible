@@ -1,18 +1,11 @@
 ---
-aurora_version: 0.7.0-RC3
+aurora_version: 0.9.0
 
 aurora_schedulers: []
 
 aurora_roles:
   - client
   - scheduler
-
-aurora_client_binaries:
-  - aurora
-  - aurora2
-  - aurora_admin
-
-aurora_mirror_base: https://s3.amazonaws.com/aurorabuilds
 
 aurora_cluster_name: main
 

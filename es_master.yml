@@ -13,6 +13,7 @@
     elasticsearch_plugin_aws_secret_key: "{{ vault_aws_secret_key }}"
     elasticsearch_plugin_aws_tag_filters:
       organization: stevesible
+      environment: prod
     newrelic_license_key: "{{ vault_newrelic_license_key }}"
     stunnel_ca_content: "{{ vault_stunnel_ca_content }}"
     stunnel_cert_content: "{{ vault_stunnel_cert_content }}"

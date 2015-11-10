@@ -35,4 +35,4 @@
     - mesos
     - thermos
     - aurora
-    #- openldap
+    - openldap

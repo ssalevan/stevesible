@@ -8,16 +8,18 @@ source ${DIR}/env/bin/activate
 if [ $# -lt 1 ]; then
   echo
   echo "Runs the bootstrap script against all the nodes in the specified group."
-  echo "Usage: ./bootstrap ANSIBLE_GROUP [USER] [SHOULD_SUDO] [SET_HOSTNAME] [CREATE_BASE_USER] [FORMAT_VOLUME]"
+  echo "Usage: ./bootstrap ANSIBLE_GROUP [USER] [SHOULD_SUDO] [SET_HOSTNAME] [CREATE_BASE_USER] [FORMAT_VOLUMES]"
   exit -1
 fi
 
 export ANSIBLE_GROUP="${1}"
 export ANSIBLE_USER="${2-ansibler}"
-export ANSIBLE_SHOULD_SUDO="${3-yes}"
-export ANSIBLE_SET_HOSTNAME="${4-no}"
-export ANSIBLE_CREATE_BASE_USER="${5-no}"
-export ANSIBLE_FORMAT_VOLUME="${6}"
+export ANSIBLE_SHOULD_SUDO="${3-True}"
+export ANSIBLE_SHOULD_SET_HOSTNAME="${4-False}"
+export ANSIBLE_SHOULD_CREATE_BASE_USER="${5-False}"
+export ANSIBLE_SHOULD_FORMAT_VOLUMES="${6-False}"
+export ANSIBLE_HOSTNAME="${7}"
+export ANSIBLE_FORMAT_VOLUMES="${8}"
 
 # Disables host key checking to support headless provisioning.
 export ANSIBLE_HOST_KEY_CHECKING=False

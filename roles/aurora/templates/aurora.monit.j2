@@ -1,7 +1,7 @@
 # {{ ansible_managed }}
 # Ensures that daemon running Aurora scheduler daemon for cluster '{{ aurora_cluster_name }}' is monitored.
 
-check process aurora-{{ safe_aurora_cluster_name }} with pidfile /var/run/aurora/{{ safe_aurora_cluster_name }}/scheduler.pid
+check process aurora with pidfile /var/run/aurora.pid
   if failed port {{ aurora_http_port }} send "GET /health HTTP/1.0\r\n" expect "OK\n" with timeout {{ aurora_http_timeout_secs }} seconds for {{ aurora_restart_cycles }} cycles then restart
-  start program = "{{ aurora_bin_dir }}/{{ safe_aurora_cluster_name }}/control start"
-  stop program = "{{ aurora_bin_dir }}/{{ safe_aurora_cluster_name }}/control stop"
+  start program = "/etc/init.d/aurora start"
+  stop program = "/etc/init.d/aurora stop"

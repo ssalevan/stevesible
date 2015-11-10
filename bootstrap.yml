@@ -5,9 +5,11 @@
   sudo: "{{ lookup('env', 'ANSIBLE_SHOULD_SUDO') }}"
 
   vars:
-    bootstrap_set_hostname: "{{ lookup('env', 'ANSIBLE_SET_HOSTNAME') }}"
-    bootstrap_create_base_user: "{{ lookup('env', 'ANSIBLE_CREATE_BASE_USER') }}"
-    bootstrap_format_ebs_volume: "{{ lookup('env', 'ANSIBLE_FORMAT_VOLUME') }}"
+    bootstrap_should_set_hostname: "{{ lookup('env', 'ANSIBLE_SHOULD_SET_HOSTNAME') }}"
+    bootstrap_should_create_base_user: "{{ lookup('env', 'ANSIBLE_SHOULD_CREATE_BASE_USER') }}"
+    bootstrap_should_format_volumes: "{{ lookup('env', 'ANSIBLE_SHOULD_FORMAT_VOLUMES') }}"
+    bootstrap_hostname: "{{ lookup('env', 'ANSIBLE_HOSTNAME') }}"
+    bootstrap_volumes_to_format: "{{ lookup('env', 'ANSIBLE_FORMAT_VOLUMES') }}"
 
   roles:
     - bootstrap

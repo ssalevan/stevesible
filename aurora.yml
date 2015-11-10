@@ -1,28 +1,26 @@
 ---
 - name: Establishes a single-node Aurora cluster
-  hosts: aurora
+  hosts: tag_ansible_group_aurora
   sudo: true
 
+  vars:
+    aurora_schedulers: "{{ groups['aurora'] | join(',') }}"
+    aurora_zookeeper_quorum: "{{ groups['aurora'] | join(',') }}"
+    docker_roles:
+      - docker
+      - registry
+    mesos_zookeeper_quorum: "{{ groups['aurora'] | join(',') }}"
+    mesos_containerizers:
+      - docker
+      - mesos
+    mesos_roles:
+      - master
+      - slave
+    zookeeper_hosts: "{{ groups['aurora'] | join(',') }}"
+
   roles:
-    - role: docker
-      docker_roles:
-        - docker
-        - registry
-
-    - role: zookeeper
-      zookeeper_hosts: "{{ groups['aurora']|join(',') }}"
-
-    - role: mesos
-      mesos_zookeeper_quorum: "{{ groups['aurora']|join(',') }}"
-      mesos_containerizers:
-        - docker
-        - mesos
-      mesos_roles:
-        - master
-        - slave
-
-    - role: thermos
-
-    - role: aurora
-      aurora_schedulers: "{{ groups['aurora']|join(',') }}"
-      aurora_zookeeper_quorum: "{{ groups['aurora']|join(',') }}"
+    - docker
+    - zookeeper
+    - mesos
+    - thermos
+    - aurora

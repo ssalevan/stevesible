@@ -6,15 +6,6 @@
   tags:
     - aurora
 
-- name: Ensure that the Aurora /var/run directory exists
-  file:
-    path: /var/run/aurora
-    state: directory
-    recurse: yes
-    mode: 0775
-  tags:
-    - aurora
-
 - name: Ensure that the Aurora directories exist
   file:
     path: "{{ item }}"
@@ -30,21 +21,31 @@
   tags:
     - aurora
 
-- name: Download Aurora scheduler
-  get_url:
-    url: "{{ aurora_mirror_base }}/{{ aurora_version }}/aurora-scheduler-{{ aurora_version }}.zip"
-    dest: "{{ aurora_lib_dir }}/{{ aurora_version }}/aurora.zip"
-  register: aurora_download
+- name: Ensure that the Aurora Yum repository is present
+  template:
+    src: ssalevan_aurora.repo.j2
+    dest: /etc/yum.repos.d/ssalevan_aurora.repo
+    mode: 0644
   tags:
-    - aurora
+    - thermos
 
-- name: Unzip Aurora archive
-  shell: "unzip {{ aurora_lib_dir }}/{{ aurora_version }}/aurora.zip"
-  args:
-    chdir: "{{ aurora_lib_dir }}/{{ aurora_version }}"
-    creates: "{{ aurora_lib_dir }}/{{ aurora_version }}/aurora-scheduler-{{ aurora_version }}"
+- name: Install Aurora scheduler RPM
+  yum:
+    name: aurora
+    state: present
+    enablerepo: ssalevan_aurora
+  when: "'scheduler' in aurora_roles"
   tags:
-    - aurora
+    - thermos
+
+- name: Install Aurora client RPM
+  yum:
+    name: aurora-client
+    state: present
+    enablerepo: ssalevan_aurora
+  when: "'client' in aurora_roles"
+  tags:
+    - thermos
 
 - name: Template Aurora ZooKeeper quorum file
   template:
@@ -90,9 +91,9 @@
     - aurora
 
 - name: Ensure that the Aurora service is running
-  shell: "/usr/bin/aurora/{{ safe_aurora_cluster_name }}/control start"
-  args:
-    creates: "{{ aurora_state_dir }}/{{ safe_aurora_cluster_name }}/scheduler.pid"
+  service:
+    name: aurora
+    state: started
   tags:
     - aurora
 
@@ -124,31 +125,11 @@
 
 - name: Ensure that Aurora is monitored by Monit
   monit:
-    name: "aurora-{{ safe_aurora_cluster_name }}"
+    name: aurora
     state: monitored
   tags:
     - aurora
     - aurora_config
-
-- name: Download Aurora client binaries
-  get_url:
-    url: "{{ aurora_mirror_base }}/{{ aurora_version }}/{{ item }}.pex"
-    dest: "/usr/bin/{{ item }}"
-  with_items: aurora_client_binaries
-  when: "'client' in aurora_roles"
-  tags:
-    - aurora
-    - aurora_client
-
-- name: Ensure that Aurora client binaries are executable
-  file:
-    path: "/usr/bin/{{ item }}"
-    mode: 0755
-  with_items: aurora_client_binaries
-  when: "'client' in aurora_roles"
-  tags:
-    - aurora
-    - aurora_client
 
 - name: Template a cluster configuration file for Aurora client binaries
   template:
