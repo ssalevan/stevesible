@@ -138,7 +138,7 @@
   git:
     repo: https://github.com/robbyrussell/oh-my-zsh.git
     dest: "/home/{{ base_user }}/.oh-my-zsh"
-  when: bootstrap_create_base_user
+  when: bootstrap_should_create_base_user == 'True'
   tags:
     - bootstrap
 
@@ -148,7 +148,7 @@
     dest: "/home/{{ base_user }}/.zshrc"
     owner: "{{ base_user }}"
     group: "{{ base_group }}"
-  when: bootstrap_create_base_user
+  when: bootstrap_should_create_base_user == 'True'
   tags:
     - bootstrap
 
@@ -160,7 +160,7 @@
     regexp: "^%{{ base_user }}"
     insertafter: "^# %wheel"
     line: "%{{ base_user }} ALL=(ALL) NOPASSWD: ALL"
-  when: bootstrap_create_base_user
+  when: bootstrap_should_create_base_user == 'True'
   tags:
     - bootstrap
 
@@ -170,7 +170,7 @@
     backup: yes
     state: absent
     regexp: "^Defaults.*requiretty"
-  when: bootstrap_create_base_user
+  when: bootstrap_should_create_base_user == 'True'
   tags:
     - bootstrap
 
