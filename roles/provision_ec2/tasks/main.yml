@@ -81,6 +81,13 @@
   tags:
     - provision_ec2
 
+- name: Disable requiretty in /etc/sudoers because many images enable it by default
+  local_action: "shell ssh -o 'StrictHostKeyChecking=no' -t -t {{ ec2_bootstrap_user }}@{{ item.public_ip }} sudo sed -i 's/^Defaults.*requiretty//' /etc/sudoers"
+  with_items: ec2_new_nodes.instances
+  when: ec2_disable_sudoers
+  tags:
+    - provision_ec2
+
 - name: Run bootstrap script for new nodes
   local_action: "shell ./bootstrap {{ item.id }} {{ ec2_bootstrap_user }} {{ ec2_bootstrap_should_sudo }} {{ ec2_create_route53_record }} {{ ec2_bootstrap_create_base_user }} {{ ec2_bootstrap_should_format_volumes }} '{{ item.id }}.{{ ec2_route53_zone }}' '{{ ec2_format_volumes }}'"
   with_items: ec2_new_nodes.instances

@@ -37,6 +37,8 @@ ec2_route53_zone: phil.collins.com.
 
 ec2_region: us-west-2
 
+ec2_disable_sudoers: true
+
 ec2_bootstrap_user: root
 ec2_bootstrap_should_sudo: false
 ec2_bootstrap_create_base_user: true
