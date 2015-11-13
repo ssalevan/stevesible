@@ -10,6 +10,8 @@
   file:
     path: "{{ item }}"
     state: directory
+    owner: aurora
+    group: aurora
     recurse: yes
   with_items:
     - "{{ aurora_bin_dir }}/{{ safe_aurora_cluster_name }}"
@@ -27,48 +29,30 @@
     dest: /etc/yum.repos.d/ssalevan_aurora.repo
     mode: 0644
   tags:
-    - thermos
+    - aurora
 
 - name: Install Aurora scheduler RPM
   yum:
     name: aurora
     state: present
     enablerepo: ssalevan_aurora
-  when: "'scheduler' in aurora_roles"
+  when: '"scheduler" in aurora_roles'
   tags:
-    - thermos
+    - aurora
 
-- name: Install Aurora client RPM
-  yum:
-    name: aurora-client
-    state: present
-    enablerepo: ssalevan_aurora
-  when: "'client' in aurora_roles"
-  tags:
-    - thermos
+# - name: Install Aurora client RPM
+#   yum:
+#     name: aurora-client
+#     state: present
+#     enablerepo: ssalevan_aurora
+#   when: '"client" in aurora_roles'
+#   tags:
+#     - aurora
 
 - name: Template Aurora ZooKeeper quorum file
   template:
     src: zk.j2
     dest: "{{ aurora_conf_dir }}/{{ safe_aurora_cluster_name }}/zk"
-  tags:
-    - aurora
-    - aurora_config
-
-- name: Template Aurora cluster-specific startup script
-  template:
-    src: aurora-startup.sh.j2
-    dest: "{{ aurora_bin_dir }}/{{ safe_aurora_cluster_name }}/startup"
-    mode: 0755
-  tags:
-    - aurora
-    - aurora_config
-
-- name: Template Aurora cluster-specific init script
-  template:
-    src: aurora-control.sh.j2
-    dest: "{{ aurora_bin_dir }}/{{ safe_aurora_cluster_name }}/control"
-    mode: 0755
   tags:
     - aurora
     - aurora_config
@@ -89,6 +73,15 @@
   when: aurora_schedulers == '127.0.0.1'
   tags:
     - aurora
+
+- name: Setup the Aurora scheduler's sysconfig
+  template:
+    src: aurora.sysconfig.j2
+    dest: /etc/sysconfig/aurora
+  when: '"scheduler" in aurora_roles'
+  tags:
+    - aurora
+    - aurora_config
 
 - name: Ensure that the Aurora service is running
   service:

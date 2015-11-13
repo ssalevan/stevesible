@@ -4,19 +4,22 @@
   sudo: true
 
   vars:
-    aurora_schedulers: "{{ groups['aurora'] | join(',') }}"
-    aurora_zookeeper_quorum: "{{ groups['aurora'] | join(',') }}"
+    aurora_roles:
+      - client
+      - scheduler
+    aurora_schedulers: "{{ groups['tag_ansible_group_aurora'] | join(',') }}"
+    aurora_zookeeper_quorum: "{{ groups['tag_ansible_group_aurora'] | join(',') }}"
     docker_roles:
       - docker
       - registry
-    mesos_zookeeper_quorum: "{{ groups['aurora'] | join(',') }}"
+    mesos_zookeeper_quorum: "{{ groups['tag_ansible_group_aurora'] | join(',') }}"
     mesos_containerizers:
       - docker
       - mesos
     mesos_roles:
       - master
       - slave
-    zookeeper_hosts: "{{ groups['aurora'] | join(',') }}"
+    zookeeper_hosts: "{{ groups['tag_ansible_group_aurora'] | join(',') }}"
 
   roles:
     - docker

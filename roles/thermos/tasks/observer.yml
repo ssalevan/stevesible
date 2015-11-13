@@ -1,7 +1,7 @@
 ---
 - name: Ensure that the Thermos observer daemon is running
   service:
-    name: thermos
+    name: thermos-observer
     state: started
   tags:
     - thermos

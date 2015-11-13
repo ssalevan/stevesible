@@ -53,8 +53,6 @@ AURORA_FLAGS=(
   # Flags to pass to the Thermos executor.
   -thermos_executor_flags="--announcer-enable --announcer-ensemble ${AURORA_ZK_ENDPOINTS}"
 
-  -gc_executor_path='{{ thermos_bin_dir }}/{{ thermos_version }}/gc_executor'
-
   -vlog='{{ aurora_log_level }}'
 
   -allowed_container_types="{{ mesos_containerizers|join(',')|upper }}"

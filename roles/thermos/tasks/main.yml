@@ -4,7 +4,14 @@
   tags:
     - thermos
 
-- name: Ensure that the Aurora Yum repository is present
+- name: Install the CentOS SCL RPM to allow for Python2.7
+  yum:
+    name: centos-release-SCL
+    state: present
+  tags:
+    - thermos
+
+- name: Ensure that the Aurora/Thermos Yum repository is present
   template:
     src: ssalevan_aurora.repo.j2
     dest: /etc/yum.repos.d/ssalevan_aurora.repo
@@ -12,7 +19,7 @@
   tags:
     - thermos
 
-- name: Install the Aurora RPM
+- name: Install the Thermos RPM
   yum:
     name: aurora-thermos
     state: present

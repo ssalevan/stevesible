@@ -1,6 +1,6 @@
 ---
 mesos_cluster_name: main
-mesos_version: 0.23.0
+mesos_version: 0.22.0
 
 mesos_roles:
   - master
@@ -15,7 +15,7 @@ mesos_isolators:
 
 mesos_slave_attributes:
   - "host:{{ mesos_ip }}"
-  - "rack:{{ datacenter_city }}"
+  - "rack:{{ ec2_region }}"
 
 mesos_executor_timeout: 5mins
 

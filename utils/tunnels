@@ -1,0 +1,140 @@
+#!/bin/bash
+# Creates SSH tunnels against a dev box for all useful infrastructure ports.
+
+DEV_USER=ansibler
+SSH_PORT=22
+
+PORTS_TO_FORWARD=(
+  "aurora-5050:0.0.0.0:5050;5051:0.0.0.0:5051;8081:0.0.0.0:8081;1338:0.0.0.0:1338"
+)
+
+DIR=$(git rev-parse --show-toplevel)
+CACHE_LOC=~/.tunnels.host
+TUNNELER_PIDFILE=~/.tunnels.pid
+
+function get_node_ip() {
+  ansible_group=${1}
+  host_cache_loc=${CACHE_LOC}.${ansible_group}
+  if [ -e ${host_cache_loc} ]; then
+    export TUNNEL_HOST=$(cat ${host_cache_loc})
+    echo " - Using stored host ${TUNNEL_HOST} for Ansible group: ${1}"
+  else
+    host=$(${DIR}/utils/get_group_host ${ansible_group})
+    if [ ${?} -ne 0 ]; then
+      echo ' ! Could not find a host; bailing'
+      exit 5
+    fi
+    export TUNNEL_HOST="${host}"
+    echo ${TUNNEL_HOST} > ${CACHE_LOC}
+  fi
+}
+
+function start_tunneler() {
+  tunnel_host="${1}"
+  ssh_tunnel_args="${2}"
+  (
+    while true; do
+      ssh -N -p ${SSH_PORT} -o ServerAliveInterval=240 -o StrictHostKeyChecking=no ${ssh_tunnel_args} ${DEV_USER}@${tunnel_host}
+      sleep 5
+    done
+  ) &
+  export TUNNELER_PID=${!}
+}
+
+function show_usage() {
+  echo "Creates SSH tunnels against all infrastructure hosts."
+  echo
+  echo "Usage:"
+  echo "./utils/tunnels [-ckr] [-h host] [-p port] [-u user]"
+  echo "  -c Clears any host detection cache"
+  echo "  -k Kills any existing tunnels"
+  echo "  -r Restarts tunnels"
+  echo "  -h Calls SSH against this host, doesn't use Ansible inventory"
+  echo "  -p Uses this port when communicating with the remote host"
+  echo "  -u Calls SSH with this user"
+}
+
+function turbokill() {
+  # Kills PID + all subprocesses.
+  CPIDS=$(pgrep -P ${1}); (sleep 33 && kill -KILL $CPIDS &); kill -TERM ${CPIDS}
+  kill ${1}
+}
+
+function check_for_tunnelers() {
+  for group_tunneler_pidfile in ${TUNNELER_PIDFILE}.*; do
+    tunneler_pid=$(cat ${group_tunneler_pidfile})
+    if ps -p $(cat ${group_tunneler_pidfile}) > /dev/null; then
+      echo " ! Tunneler is currently running (pid: ${tunneler_pid}), try -r to restart tunneler"
+      exit 2
+    fi
+  done
+}
+
+function clear_host_cache() {
+  for host_cache_loc in ${CACHE_LOC}.*; do
+    rm -f ${host_cache_loc}
+  done
+}
+
+function kill_tunnelers() {
+  echo ' - Killing any existing tunnels...'
+  for group_tunneler_pidfile in ${TUNNELER_PIDFILE}.*; do
+    turbokill $(cat ${group_tunneler_pidfile})
+  done
+  pkill -f utils/tunnels
+}
+
+should_query_ansible=1
+while getopts "ckrh:p:u:" OPTION
+do
+  case $OPTION in
+  c)
+    clear_host_cache
+    ;;
+  k)
+    kill_tunnelers
+    exit 0
+    ;;
+  r)
+    kill_tunnelers
+    ;;
+  h)
+    TUNNEL_HOST="${OPTARG}"
+    should_query_ansible=0
+    ;;
+  p)
+    SSH_PORT="${OPTARG}"
+    ;;
+  u)
+    DEV_USER="${OPTARG}"
+    ;;
+  [?])
+    show_usage
+    exit 1
+    ;;
+  esac
+done
+shift $((${OPTIND}-1))
+
+check_for_tunnelers
+
+for group_to_ports in "${PORTS_TO_FORWARD[@]}"; do
+  ansible_group=$(echo ${group_to_ports} | cut -d'-' -f1)
+  # If we wish to query Ansible, pulls an IP for the supplied Ansible group.
+  if [ ${should_query_ansible} -eq 1 ]; then
+    get_node_ip ${ansible_group}
+  fi
+  port_fwd_group=$(echo ${group_to_ports} | cut -d'-' -f2)
+  echo " - Tunnelling ${ansible_group} infrastructure ports from node: ${TUNNEL_HOST}"
+  echo "   + ${port_fwd_group}"
+  SSH_TUNNEL_ARGS=""
+  for port_to_fwd in ${port_fwd_group//;/$'\n'}; do
+    SSH_TUNNEL_ARGS="${SSH_TUNNEL_ARGS} -L ${port_to_fwd}"
+  done
+
+  start_tunneler ${TUNNEL_HOST} "${SSH_TUNNEL_ARGS}"
+  echo ${TUNNELER_PID} > ${TUNNELER_PIDFILE}.${ansible_group}
+  echo " - Tunneler active for group: ${ansible_group} (pid: ${TUNNELER_PID})"
+done
+
+echo " - Tunnels have been created."
