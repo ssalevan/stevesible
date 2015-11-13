@@ -8,8 +8,8 @@
 
 - name: Set hostname (if requested)
   hostname:
-    name: "{{ bootstrap_set_hostname }}"
-  when: bootstrap_set_hostname != ''
+    name: "{{ bootstrap_hostname }}"
+  when: bootstrap_should_set_hostname == 'True'
   tags:
     - bootstrap
     - system_update
@@ -95,6 +95,7 @@
 - name: Create initial user
   user:
     name: "{{ base_user }}"
+    group: "{{ base_group }}"
     password: "aweiofwepfw9fhewfpodsufnewifpeufhwbeibw4ioefwuehbfoiwefb"
     shell: /bin/zsh
   when: bootstrap_should_create_base_user == 'True'
