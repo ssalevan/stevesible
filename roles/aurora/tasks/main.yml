@@ -6,23 +6,6 @@
   tags:
     - aurora
 
-- name: Ensure that the Aurora directories exist
-  file:
-    path: "{{ item }}"
-    state: directory
-    owner: aurora
-    group: aurora
-    recurse: yes
-  with_items:
-    - "{{ aurora_bin_dir }}/{{ safe_aurora_cluster_name }}"
-    - "{{ aurora_log_dir }}/{{ safe_aurora_cluster_name }}"
-    - "{{ aurora_conf_dir }}/{{ safe_aurora_cluster_name }}"
-    - "{{ aurora_state_dir }}/{{ safe_aurora_cluster_name }}"
-    - "{{ aurora_state_dir }}/{{ safe_aurora_cluster_name }}/{{ aurora_backup_path }}"
-    - "{{ aurora_lib_dir }}/{{ aurora_version }}"
-  tags:
-    - aurora
-
 - name: Ensure that the Aurora Yum repository is present
   template:
     src: ssalevan_aurora.repo.j2
@@ -37,6 +20,23 @@
     state: present
     enablerepo: ssalevan_aurora
   when: '"scheduler" in aurora_roles'
+  tags:
+    - aurora
+
+- name: Ensure that the Aurora directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: aurora
+    group: aurora
+    recurse: yes
+  with_items:
+    - "{{ aurora_bin_dir }}/{{ safe_aurora_cluster_name }}"
+    - "{{ aurora_log_dir }}/{{ safe_aurora_cluster_name }}"
+    - "{{ aurora_conf_dir }}/{{ safe_aurora_cluster_name }}"
+    - "{{ aurora_state_dir }}/{{ safe_aurora_cluster_name }}"
+    - "{{ aurora_state_dir }}/{{ safe_aurora_cluster_name }}/{{ aurora_backup_path }}"
+    - "{{ aurora_lib_dir }}/{{ aurora_version }}"
   tags:
     - aurora
 

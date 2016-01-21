@@ -7,19 +7,19 @@
     aurora_roles:
       - client
       - scheduler
-    aurora_schedulers: "{{ groups['tag_ansible_group_aurora'] | join(',') }}"
-    aurora_zookeeper_quorum: "{{ groups['tag_ansible_group_aurora'] | join(',') }}"
+    aurora_schedulers: 127.0.0.1
+    aurora_zookeeper_quorum: 127.0.0.1
     docker_roles:
       - docker
       - registry
-    mesos_zookeeper_quorum: "{{ groups['tag_ansible_group_aurora'] | join(',') }}"
+    mesos_zookeeper_quorum: 127.0.0.1
     mesos_containerizers:
       - docker
       - mesos
     mesos_roles:
       - master
       - slave
-    zookeeper_hosts: "{{ groups['tag_ansible_group_aurora'] | join(',') }}"
+    zookeeper_hosts: 127.0.0.1
 
   roles:
     - docker

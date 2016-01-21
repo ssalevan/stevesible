@@ -7,7 +7,7 @@ provision_vars:
     ec2_route53_zone: aurora.stevesible.biz.
     ec2_create_ebs_volume: false
     ec2_security_group: aurora_sg
-    ec2_vpc_subnet_id: subnet-1234567
+    ec2_vpc_subnet_id: subnet-4a243b2f
     ec2_tags:
       ansible_group: aurora
 

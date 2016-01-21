@@ -1,4 +1,9 @@
 ---
+- name: Install any SELinux-related packages
+  yum:
+    name: libselinux-python
+    state: present
+
 - name: Bootstrap ansible-bootstrap-epel Yum repository
   template:
     src: ansible-bootstrap-epel.repo.j2
