@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description: Snap Telemetry Service
+After=network.target
+
+[Service]
+Type=simple
+SyslogIdentifier=snapd
+ExecStart=/usr/local/bin/snapd "{{ snapd_args }}"
+
+[Install]
+WantedBy=multi-user.target

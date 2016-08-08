@@ -1,0 +1,19 @@
+---
+- name: Extract and install Go
+  unarchive:
+    src: "{{ golang_release_download_url }}"
+    dest: /usr/local/
+    remote_src: yes
+  tags:
+    - golang
+
+- name: Symlink Go into /usr/local/bin
+  file: src="/usr/local/go/bin/{{ item }}"
+        dest="/usr/local/bin/{{ item }}"
+        state=link
+  with_items:
+    - go
+    - godoc
+    - gofmt
+  tags:
+    - golang

@@ -1,0 +1,31 @@
+---
+- name: Setup Monit configuration for snapd
+  template:
+    src: snapd.monit.j2
+    dest: /etc/monit.d/snapd
+  register: snapd_monit
+  tags:
+    - snap
+
+- name: Ensure that Monit is reloaded
+  service:
+    name: monit
+    state: reloaded
+  when: snapd_monit.changed
+  tags:
+    - snap
+
+- name: Wait for Monit to get its act together
+  pause:
+    seconds: 10
+  when: snapd_monit.changed
+  tags:
+    - snap
+
+- name: Ensure that snapd is monitored by Monit
+  monit:
+    name: snapd
+    state: monitored
+  ignore_errors: yes
+  tags:
+    - snapd

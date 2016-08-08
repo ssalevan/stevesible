@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  author: James Molet <james.molet@gmail.com>
+  description: Sets up the snap telemetry system: http://snap-telemetry.io
+  license: Apache 2
+  min_ansible_version: 2.0
+  categories:
+    - system
+
+dependencies:
+  - { role: 'monit', when: snap_use_monit == 'yes' }
+  - { role: 'golang', when: snap_install_method == 'source' }

@@ -1,0 +1,34 @@
+---
+#tasks file for snap
+
+- include: release.yml
+  when: snap_install_method == "release"
+  tags:
+    - snap
+
+- include: source.yml
+  when: snap_install_method == "source"
+  tags:
+    - snap
+
+- name: Template the snapd systemd service script
+  template:
+    src: snapd.service.j2
+    dest: /usr/lib/systemd/system/snapd.service
+    mode: 0755
+  register: snapd_service
+  tags:
+    - snap
+
+- name: Restart snapd
+  service:
+    name: snapd
+    state: "{% if snapd_service.changed %}restarted{% else %}started{% endif %}"
+  tags:
+    - snap
+
+- include: monit.yml
+  when: snap_use_monit == "yes"
+  tags:
+    - snap
+

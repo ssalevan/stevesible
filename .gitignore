@@ -75,3 +75,6 @@ tmp/
 
 # pw file from vault-merge.shj
 .ansible-vault-password
+
+# jetbrains crap
+.idea

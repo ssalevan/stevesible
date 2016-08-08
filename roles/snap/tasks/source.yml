@@ -1,0 +1,17 @@
+---
+- name: Fetch the snap source
+  git:
+    repo: "{{ snap_git_source }}"
+    dest: /tmp/snap-source
+    force: yes
+  tags:
+    - snap
+
+- name: Build and Install snap from the Makefile
+  make:
+    chdir: /tmp/snap-source
+    target: install
+  environment:
+    PATH: "{{ ansible_env.PATH }}:{{ golang_path }}/bin"
+  tags:
+    - snap

@@ -1,0 +1,47 @@
+---
+# Installs snap from a release tarball
+
+- name: Download Snap Release
+  unarchive:
+    src: "{{ snap_release_url }}"
+    dest: /tmp/snap_release
+    remote_src: yes
+  tags:
+    - snap
+
+- name: Move snap binaries to path
+  copy:
+    src: /tmp/snap_release/bin/
+    dest: /usr/local/bin/
+  tags:
+    - snap
+
+- name: Download Snap Plugins
+  unarchive:
+    src: "{{ snap_plugins_release_url }}"
+    dest: /tmp/snap_release
+    remote_src: yes
+  tags:
+    - snap
+
+- name: Ensure Snap plugin path exists
+  file:
+    path: "{{ snap_plugin_path }}"
+    state: directory
+    mode: 0755
+  tags:
+    - snap
+
+- name: Move Snap plugins to plugin path
+  copy:
+    src: /tmp/snap_release/plugins/
+    dest: "{{ snap_plugin_path }}"
+  tags:
+    - snap
+
+- name: Cleanup Snap download
+  file:
+    path: /tmp/snap_release
+    state: absent
+  tags:
+    - snap

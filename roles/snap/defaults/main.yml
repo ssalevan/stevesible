@@ -1,0 +1,22 @@
+---
+#defaults file for snap
+
+# set to 'release' when using the brebuilt snap release tar files
+# set to 'source' when building directly from source
+snap_install_method: release
+
+# these are used when install_method is set to 'release'
+snap_release_url: https://github.com/intelsdi-x/snap/releases/download/v0.15.0-beta/snap-v0.15.0-beta-linux-amd64.tar.gz
+snap_plugins_relase_url: https://github.com/intelsdi-x/snap/releases/download/v0.15.0-beta/snap-plugins-v0.15.0-beta-linux-amd64.tar.gz
+
+# git source used when install method is set to 'source'
+snap_git_source: https://github.com/intelsdi-x/snap.git
+
+# Set to 'yes' to install monit and snap monit configuration
+snap_use_monit: yes
+
+# Path to install the snap plugins
+snap_plugin_path: /usr/lib/snap/plugins
+
+# Startup arguments applied to snapd
+snapd_args: --plugin-trust 0 --log-level 1

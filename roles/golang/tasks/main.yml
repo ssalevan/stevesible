@@ -1,0 +1,18 @@
+---
+- include: release.yml
+  when: golang_install_method == "release"
+  tags:
+    - golang
+
+- include: package.yml
+  when: golang_install_method == "package"
+  tags:
+    - golang
+
+- name: Install Godep
+  command: go get github.com/tools/godep
+           creates="{{ golang_path }}/bin/godep"
+  environment:
+    GOPATH: "{{ golang_path }}"
+  tags:
+    - golang

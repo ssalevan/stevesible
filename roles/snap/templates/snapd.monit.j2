@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+# Ensures that snapd is running.
+
+check process snapd with match snapd
+  start program = "/bin/systemctl start snapd.service"
+  stop program = "/bin/systemctl stop snapd.service"
+  if cpu > 98% for 5 cycles then restart

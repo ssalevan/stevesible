@@ -1,0 +1,16 @@
+---
+
+golang_install_method: "package"
+
+golang_version: 1.6.3
+golang_os: linux
+golang_arch: amd64
+
+golang_release_download_url: "https://storage.googleapis.com/golang/go{{ golang_version }}.{{ golang_os }}-{{ golang_arch }}.tar.gz"
+
+golang_packages:
+  - golang
+  - golang-bin
+  - golang-src
+
+golang_path: "/home/{{ ansible_ssh_user }}"
